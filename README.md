@@ -27,6 +27,7 @@ BigQuery public dataset:
 | `daily_segment_mart` | date x device x source/medium/channel x user type | 4,320 | 세그먼트 drill-down |
 | `monthly_kpi_mart` | month | 3 | 월별 KPI 비교 |
 | `current_month_kpi_mart` | current month | 1 | 상단 scorecard 및 MoM 비교 |
+| `monthly_funnel_mart` | month | 3 | CVR 하락 단계 진단 |
 
 데이터 기간:
 - 2020-11-01 to 2021-01-31
@@ -82,6 +83,10 @@ BigQuery public dataset:
 
 8. `sql/07_current_month_kpi_mart.sql`
    - 현재 분석 월과 전월을 비교하는 scorecard용 mart 생성
+
+9. `sql/08_monthly_funnel_mart.sql`
+   - Loose session funnel 기준 월별 전환 단계 mart 생성
+   - Session → Product View → Add to Cart → Checkout → Purchase
 
 ## 자동 생성 대시보드
 
