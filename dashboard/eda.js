@@ -246,12 +246,13 @@ function metricDelta(row, prev, metric) {
 }
 
 function renderWeekday(rows) {
-  const names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const grouped = names.map((name) => ({ name, sum: 0, n: 0 }));
   rows.forEach((r) => {
     const d = new Date(`${r.date}T00:00:00`).getDay();
-    grouped[d].sum += r.revenue;
-    grouped[d].n += 1;
+    const mondayIndex = d === 0 ? 6 : d - 1;
+    grouped[mondayIndex].sum += r.revenue;
+    grouped[mondayIndex].n += 1;
   });
   const avg = grouped.map((g) => ({ ...g, avg: g.n ? g.sum / g.n : 0 }));
   const max = Math.max(...avg.map((g) => g.avg), 1);
