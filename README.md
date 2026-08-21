@@ -92,6 +92,13 @@ Looker Studio UI 배치와 별도로, 포트폴리오 화면 퀄리티를 빠르
 
 상단 KPI는 월별 distinct grain 이슈를 피하기 위해 `monthly_kpi_mart` 기준으로 계산하고, 일별 추세 차트는 `daily_kpi_mart`를 사용한다.
 
+대시보드 상단 필터에서 Month, Channel, Device, User Type을 선택할 수 있다. 세그먼트 리스트의 행을 클릭하면 해당 segment 기준으로 KPI와 차트가 다시 계산된다.
+
+주의:
+- 전체 월별 KPI는 exact monthly mart 기준이다.
+- Channel/Device/User Type drill-down은 `daily_segment_mart`의 daily grain을 선택 기간 안에서 합산한 방향성 분석용이다.
+- 1월 Revenue 하락은 원천 BigQuery 월별 exact 집계에서도 확인되지만, `transaction_id` 품질 이슈가 있어 주문 수보다 Revenue, Session CVR, AOV 중심으로 해석한다.
+
 ## Looker Studio 대시보드 구성
 
 추천 페이지:

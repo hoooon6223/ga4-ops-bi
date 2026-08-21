@@ -178,10 +178,43 @@ h1 {
   font-size: 12px;
 }
 
-.select-card strong {
-  display: block;
+.select-card select {
+  width: 100%;
   margin-top: 3px;
+  padding: 0;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  outline: 0;
   font-size: 14px;
+  font-weight: 800;
+}
+
+.status-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  margin: -4px 0 16px;
+  padding: 8px 12px;
+  color: #2459c9;
+  background: #eef4ff;
+  border: 1px solid #dae6ff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.status-strip button {
+  min-height: 28px;
+  padding: 0 12px;
+  color: #364152;
+  background: var(--paper);
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .kpi-grid {
@@ -342,12 +375,22 @@ h2 {
   grid-template-columns: minmax(0, 1fr) 76px 74px;
   align-items: center;
   gap: 10px;
+  width: 100%;
   padding: 10px 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
   border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  text-align: left;
 }
 
 .segment-row:last-child {
   border-bottom: 0;
+}
+
+.segment-row:hover {
+  background: #f8faff;
 }
 
 .segment-name {
@@ -398,21 +441,39 @@ h2 {
   line-height: 1.75;
 }
 
+.dq-row,
 .action-row {
   margin-top: 18px;
   padding: 14px;
-  background: #f4f7ff;
-  border: 1px solid #dfe7ff;
   border-radius: 8px;
 }
 
+.dq-row {
+  background: #f5fbf8;
+  border: 1px solid #d9f0e5;
+}
+
+.action-row {
+  background: #f4f7ff;
+  border: 1px solid #dfe7ff;
+}
+
+.dq-row span,
 .action-row span {
   display: block;
-  color: #2459c9;
   font-size: 12px;
   font-weight: 800;
 }
 
+.dq-row span {
+  color: var(--good);
+}
+
+.action-row span {
+  color: #2459c9;
+}
+
+.dq-row b,
 .action-row b {
   display: block;
   margin-top: 4px;

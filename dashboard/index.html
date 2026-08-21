@@ -47,22 +47,27 @@
         </div>
 
         <section class="filters" aria-label="Dashboard filters">
-          <div class="select-card">
-            <span>Timeframe</span>
-            <strong>2020.11 - 2021.01</strong>
-          </div>
-          <div class="select-card">
-            <span>Current month</span>
-            <strong>2021.01</strong>
-          </div>
-          <div class="select-card">
-            <span>Benchmark</span>
-            <strong>Previous month</strong>
-          </div>
-          <div class="select-card">
-            <span>Grain</span>
-            <strong>Daily / Monthly</strong>
-          </div>
+          <label class="select-card">
+            <span>Month</span>
+            <select id="month-filter"></select>
+          </label>
+          <label class="select-card">
+            <span>Channel</span>
+            <select id="channel-filter"></select>
+          </label>
+          <label class="select-card">
+            <span>Device</span>
+            <select id="device-filter"></select>
+          </label>
+          <label class="select-card">
+            <span>User type</span>
+            <select id="user-filter"></select>
+          </label>
+        </section>
+
+        <section class="status-strip" aria-label="Current dashboard context">
+          <span id="context-label">All traffic · exact monthly KPI</span>
+          <button id="reset-filters" type="button">Reset</button>
         </section>
 
         <section class="kpi-grid" id="kpi-grid" aria-label="Current month KPI cards"></section>
@@ -103,7 +108,7 @@
             <div class="panel-head">
               <div>
                 <h2>Segment Risk</h2>
-                <p>Revenue loss concentration</p>
+                <p>Click a row to drill down</p>
               </div>
             </div>
             <div id="segment-table" class="segment-list"></div>
@@ -124,6 +129,10 @@
                 디바이스, 채널, 유저 타입 또는 퍼널 단계에 집중되는지 확인하는
                 방향으로 확장한다.
               </p>
+              <div class="dq-row">
+                <span>Data check</span>
+                <b>Raw BigQuery 기준 92일 모두 존재. 1월 Revenue -64.3%, Session CVR -0.64pp 확인.</b>
+              </div>
               <div class="action-row">
                 <span>Next action</span>
                 <b>하락 기여도가 큰 device / channel / user type 기준으로 funnel step 재정의 후 drill-down</b>

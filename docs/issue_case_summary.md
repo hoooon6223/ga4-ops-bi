@@ -16,6 +16,25 @@ GA4 샘플 데이터 기간:
 | 2020-12 | 133,368 | 104,315 | 1,975 | 2,434 | 160,555 | 1.59% | 65.96 |
 | 2021-01 | 118,380 | 94,790 | 1,069 | 1,204 | 57,350 | 0.94% | 47.63 |
 
+## Raw BigQuery 재검증 결과
+
+2021년 1월 하락은 `daily_kpi_mart`를 월로 단순 합산해서 생긴 오류가 아니라, 원천 GA4 event table을 월별 exact distinct 기준으로 다시 집계해도 동일하게 확인된다.
+
+12월 대비 1월:
+- Revenue: 160,555 → 57,350 (**-64.3%**)
+- Sessions: 133,368 → 118,380 (**-11.2%**)
+- Purchase sessions: 2,116 → 1,115 (**-47.3%**)
+- Session CVR: 1.59% → 0.94% (**-0.64pp**)
+- AOV: 65.96 → 47.63 (**-27.8%**)
+
+다만 `transaction_id`는 품질 이슈가 있으므로 주문 수는 해석에 주의한다.
+
+- purchase event count: 5,692
+- distinct transaction_id: 4,452
+- duplicate transaction_id count: 327
+
+따라서 이 포트폴리오의 핵심 진단 지표는 Revenue, Session CVR, AOV, Revenue per Session으로 둔다.
+
 ## 이 케이스가 적절한 이유
 
 12월에서 1월로 넘어가며:
