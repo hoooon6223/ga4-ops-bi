@@ -42,6 +42,19 @@ function weekStart(date) {
   return d.toISOString().slice(0, 10);
 }
 
+function displayPeriodLabel(date) {
+  if (state.grain === "monthly") return date;
+
+  const d = new Date(`${date}T00:00:00`);
+  if (state.grain === "weekly") {
+    const weekOfMonth = Math.floor((d.getDate() - 1) / 7) + 1;
+    return `${date} · ${weekOfMonth}주차`;
+  }
+
+  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+  return `${date} · ${weekdays[d.getDay()]}요일`;
+}
+
 function weeklyRows(rows) {
   const grouped = new Map();
   rows.forEach((row) => {
@@ -194,7 +207,7 @@ function renderDetail(rows) {
     "DoD";
   document.querySelector("#selected-title").textContent = label;
   document.querySelector("#day-detail").innerHTML = `
-    <div class="selected-date">${row.date}</div>
+    <div class="selected-date">${displayPeriodLabel(row.date)}</div>
     <dl>
       ${detailMetrics.map((metric) => {
         const delta = prev ? metricDelta(row, prev, metric) : null;
