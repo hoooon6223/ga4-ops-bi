@@ -1,14 +1,14 @@
-# Project Management
+# 프로젝트 관리
 
 ## BigQuery
 
-Current Google Cloud project:
+현재 Google Cloud project:
 
 ```text
 bigquery-457902
 ```
 
-Dataset layout:
+Dataset 구조:
 
 ```text
 bigquery-457902
@@ -22,52 +22,49 @@ bigquery-457902
     └── daily_segment_mart
 ```
 
-Decision:
-- Keep the portfolio project in its own dataset: `ga4_ops_bi`.
-- Do not mix it with the existing `basic` practice dataset.
-- Use `sql/build_tables.sql` as the reproducible build script for managed mart tables.
+결정 사항:
+- 포트폴리오 프로젝트는 별도 dataset인 `ga4_ops_bi`에서 관리한다.
+- 기존 연습용 dataset인 `basic`과 섞지 않는다.
+- `sql/build_tables.sql`을 관리용 mart table 재생성 스크립트로 사용한다.
 
-## Local Project
+## 로컬 프로젝트
 
-Local path:
+로컬 경로:
 
 ```text
 /Users/hyeon/Documents/ChatGPT/데이터 분석/ga4_ops_bi
 ```
 
-Recommended repo contents:
+권장 repo 구성:
 - `README.md`
 - `sql/`
 - `docs/`
 - `data/`
 
-Note:
-- CSV files in `data/` are Tableau-ready exports.
-- If the GitHub repo should stay lightweight, large dashboard exports can be excluded later with `.gitignore`.
+메모:
+- `data/` 안의 CSV 파일은 Tableau에 바로 연결할 수 있는 export 파일이다.
+- Tableau workbook이나 큰 dashboard export 파일은 필요 시 `.gitignore`로 제외한다.
 
 ## GitHub
 
-GitHub CLI is installed, but authentication is not complete yet.
+GitHub repo:
 
-To finish authentication from a normal terminal:
-
-```bash
-gh auth login
+```text
+https://github.com/hoooon6223/ga4-ops-bi
 ```
 
-Recommended answers:
-- GitHub.com
-- HTTPS
-- Authenticate Git with GitHub credentials: Yes
-- Login with a web browser
+상태:
+- GitHub CLI 인증 완료
+- Remote `origin` 연결 완료
+- `main` branch push 완료
+- Repository visibility: private
 
-After login, this project can be published with:
+기본 관리 흐름:
 
 ```bash
-cd "/Users/hyeon/Documents/ChatGPT/데이터 분석"
-git init
-git add ga4_ops_bi
-git commit -m "Add GA4 operations BI portfolio project"
-gh repo create ga4-ops-bi --private --source=. --remote=origin --push
+cd "/Users/hyeon/Documents/ChatGPT/데이터 분석/ga4_ops_bi"
+git status
+git add .
+git commit -m "Update GA4 operations BI project"
+git push
 ```
-

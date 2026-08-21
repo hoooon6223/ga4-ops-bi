@@ -1,56 +1,56 @@
-# GA4 Operations BI Dashboard Grain Plan
+# GA4 운영 BI 대시보드 Grain 설계
 
-## Recommended Grain
+## 추천 Grain
 
-Use **daily grain** for the core marts.
+핵심 mart는 **daily grain**으로 만든다.
 
-Reason:
-- Operations dashboards should support day-to-day monitoring.
-- Daily marts can be aggregated to week/month in Tableau.
-- Daily trends make KPI drops, spikes, and weekday effects visible.
-- The dataset only covers 2020-11-01 to 2021-01-31, so monthly comparison should be framed as an issue diagnosis, not a long-term trend analysis.
+이유:
+- 운영 대시보드는 일 단위 모니터링을 지원해야 한다.
+- daily mart는 Tableau에서 week/month 단위로 쉽게 집계할 수 있다.
+- 일별 추세를 보면 KPI 하락, spike, 요일 효과를 확인하기 좋다.
+- 데이터 기간이 2020-11-01부터 2021-01-31까지 3개월이므로, 월별 비교는 장기 추세 분석이 아니라 단기 이슈 진단으로 해석해야 한다.
 
-## Dashboard Comparison Logic
+## 대시보드 비교 기준
 
-Primary monitoring:
-- Daily KPI trend
-- 7-day moving average
-- Week-over-week change
+기본 모니터링:
+- 일별 KPI trend
+- 7일 이동평균
+- 전주 대비 변화
 
-Portfolio case:
-- Month-over-month CVR drop diagnosis
-- If monthly data looks uneven, switch to previous 4 weeks vs recent 4 weeks.
+포트폴리오 진단 케이스:
+- 전월 대비 CVR 하락 진단
+- 월별 비교가 애매하면 이전 4주 vs 최근 4주 비교로 전환
 
-## Core KPI Decomposition
+## 핵심 KPI 분해
 
 Revenue = Sessions x CVR x AOV
 
-Definitions:
+정의:
 - Sessions: distinct `user_pseudo_id + ga_session_id`
-- Purchasers: distinct users with `purchase`
-- Orders: purchase events
+- Purchasers: `purchase`가 발생한 distinct user
+- Orders: purchase event count
 - Revenue: `ecommerce.purchase_revenue`
 - CVR: purchase sessions / sessions
 - AOV: revenue / orders
 - Revenue per Session: revenue / sessions
 
-Note:
-- This GA4 sample has duplicated and placeholder transaction IDs such as `(not set)`.
-- For dashboard stability, orders are defined as purchase event count, while transaction ID quality is treated as a DQ check.
+메모:
+- 이 GA4 샘플에는 중복 transaction ID와 `(not set)` 같은 placeholder ID가 있다.
+- 대시보드 안정성을 위해 orders는 purchase event count로 정의하고, transaction ID 품질은 DQ check에서 별도로 다룬다.
 
-## Tableau Pages
+## Tableau 페이지
 
 1. Executive Monitoring
    - Revenue, Sessions, CVR, AOV, Orders, Purchasers
-   - Daily trend and MoM/WoW comparison
+   - 일별 trend와 MoM/WoW 비교
    - Revenue decomposition
 
 2. Funnel Diagnosis
    - Session -> View Item -> Add to Cart -> Begin Checkout -> Purchase
-   - Step conversion rates and drop-off
-   - Current period vs comparison period
+   - 단계별 전환율과 drop-off
+   - 현재 기간 vs 비교 기간
 
 3. Segment Drill-down
    - Device, channel, source/medium, user type, item category
-   - CVR change heatmap
-   - Problem segment top table
+   - CVR 변화 heatmap
+   - 문제 세그먼트 Top table
