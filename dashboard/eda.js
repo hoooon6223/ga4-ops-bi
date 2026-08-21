@@ -7,6 +7,7 @@ const metricMeta = {
   session_cvr: { label: "Session CVR", format: (v) => `${(v * 100).toFixed(2)}%` },
   aov: { label: "AOV", format: (v) => `$${v.toFixed(2)}` },
 };
+const detailMetrics = ["revenue", "sessions", "session_cvr", "aov"];
 
 function parseCsv(text) {
   const [headerLine, ...lines] = text.trim().split(/\r?\n/);
@@ -48,6 +49,30 @@ function weeklyRows(rows) {
     const current = grouped.get(key) ?? {
       date: key,
       label: `${key} week`,
+      sessions: 0,
+      orders: 0,
+      revenue: 0,
+      purchase_sessions: 0,
+    };
+    current.sessions += row.sessions;
+    current.orders += row.orders;
+    current.revenue += row.revenue;
+    current.purchase_sessions += row.purchase_sessions;
+    grouped.set(key, current);
+  });
+  return [...grouped.values()].sort((a, b) => a.date.localeCompare(b.date)).map((row) => ({
+    ...row,
+    session_cvr: row.sessions ? row.purchase_sessions / row.sessions : 0,
+    aov: row.purchase_sessions ? row.revenue / row.purchase_sessions : 0,
+  }));
+}
+
+function monthlyRows(rows) {
+  const grouped = new Map();
+  rows.forEach((row) => {
+    const key = monthOf(row.date);
+    const current = grouped.get(key) ?? {
+      date: key,
       sessions: 0,
       orders: 0,
       revenue: 0,
@@ -114,7 +139,7 @@ function lineChart(target, rows, metric, withAverage = true, options = {}) {
   const points = data.map((r, i) => `${x(i)},${y(r[metric])}`).join(" ");
   const avg = data.map((r, i) => `${x(i)},${y(r.ma)}`).join(" ");
   const ticks = data.filter((r, i) => {
-    if (state.grain === "weekly") return i === 0 || i === data.length - 1 || i % 2 === 0;
+    if (state.grain !== "daily") return true;
     return i === 0 || r.date.endsWith("-15") || i === data.length - 1;
   });
   const yTicks = [0, 0.25, 0.5, 0.75, 1].map((ratio) => min + (max - min) * ratio);
@@ -154,28 +179,56 @@ function lineChart(target, rows, metric, withAverage = true, options = {}) {
 }
 
 function renderDetail(rows) {
-  const row = rows.find((r) => r.date === state.selectedDate) || rows[rows.length - 1];
+  const foundIndex = rows.findIndex((r) => r.date === state.selectedDate);
+  const rowIndex = foundIndex >= 0 ? foundIndex : rows.length - 1;
+  const row = rows[rowIndex] || rows[rows.length - 1];
+  const prev = rows[rowIndex - 1] || null;
   state.selectedDate = row.date;
+  const label =
+    state.grain === "monthly" ? "Selected Month" :
+    state.grain === "weekly" ? "Selected Week" :
+    "Selected Day";
+  const benchmark =
+    state.grain === "monthly" ? "MoM" :
+    state.grain === "weekly" ? "WoW" :
+    "DoD";
+  document.querySelector("#selected-title").textContent = label;
   document.querySelector("#day-detail").innerHTML = `
     <div class="selected-date">${row.date}</div>
     <dl>
-      <div><dt>Revenue</dt><dd>$${fmt.format(row.revenue)}</dd></div>
-      <div><dt>Sessions</dt><dd>${fmt.format(row.sessions)}</dd></div>
-      <div><dt>CVR</dt><dd>${(row.session_cvr * 100).toFixed(2)}%</dd></div>
-      <div><dt>AOV</dt><dd>$${row.aov.toFixed(2)}</dd></div>
+      ${detailMetrics.map((metric) => {
+        const delta = prev ? metricDelta(row, prev, metric) : null;
+        return `
+          <div>
+            <dt>${metricMeta[metric].label}</dt>
+            <dd>
+              <strong>${metricMeta[metric].format(row[metric])}</strong>
+              <span class="${delta && delta.raw < 0 ? "down" : "up"}">${delta ? `${delta.text} ${benchmark}` : "No benchmark"}</span>
+            </dd>
+          </div>
+        `;
+      }).join("")}
     </dl>
   `;
 }
 
-function renderDrivers(rows) {
-  const metrics = ["sessions", "session_cvr", "aov"];
-  document.querySelector("#driver-sparklines").innerHTML = metrics.map((m) => `
-    <div class="spark-card">
-      <span>${metricMeta[m].label}</span>
-      <div id="spark-${m}" class="spark"></div>
-    </div>
-  `).join("");
-  metrics.forEach((m) => lineChart(`#spark-${m}`, rows, m, false, { compact: true, height: 86 }));
+function metricDelta(row, prev, metric) {
+  const current = Number(row[metric] || 0);
+  const previous = Number(prev[metric] || 0);
+  if (metric === "session_cvr") {
+    return {
+      raw: current - previous,
+      text: `${current - previous >= 0 ? "+" : ""}${((current - previous) * 100).toFixed(2)}pp`,
+    };
+  }
+  if (!previous) {
+    return { raw: current - previous, text: "n/a" };
+  }
+  const ratio = (current - previous) / previous;
+  return {
+    raw: ratio,
+    text: `${ratio >= 0 ? "+" : ""}${(ratio * 100).toFixed(1)}%`,
+  };
 }
 
 function renderWeekday(rows) {
@@ -199,16 +252,20 @@ function renderWeekday(rows) {
 
 function render(rows) {
   const dailyScoped = rowsForMonth(rows);
-  const scoped = state.grain === "weekly" ? weeklyRows(dailyScoped) : dailyScoped;
+  const scoped =
+    state.grain === "monthly" ? monthlyRows(dailyScoped) :
+    state.grain === "weekly" ? weeklyRows(dailyScoped) :
+    dailyScoped;
   renderKpis(scoped);
   lineChart("#main-trend", scoped, state.metric, state.grain === "daily", {
-    window: state.grain === "daily" ? 7 : 3,
+    window: 7,
   });
   renderDetail(scoped);
-  renderDrivers(scoped);
   renderWeekday(dailyScoped);
   document.querySelector("#trend-caption").textContent =
-    state.grain === "daily" ? "실선은 일별 지표, 점선은 7일 이동평균" : "주별 합산/재계산 지표. CVR과 AOV는 주 단위로 다시 계산";
+    state.grain === "monthly" ? "월별 합산/재계산 지표. CVR과 AOV는 월 단위로 다시 계산" :
+    state.grain === "weekly" ? "주별 합산/재계산 지표. CVR과 AOV는 주 단위로 다시 계산" :
+    "실선은 일별 지표, 점선은 7일 이동평균";
   document.querySelector("#month-select").value = state.month;
   document.querySelectorAll(".grain-switch button").forEach((b) => b.classList.toggle("active", b.dataset.grain === state.grain));
   document.querySelectorAll(".metric-switch button").forEach((b) => b.classList.toggle("active", b.dataset.metric === state.metric));
@@ -228,10 +285,12 @@ function bind(rows) {
   document.querySelector("#grain-switch").innerHTML = `
     <button data-grain="daily" type="button">Daily</button>
     <button data-grain="weekly" type="button">Weekly</button>
+    <button data-grain="monthly" type="button">Monthly</button>
   `;
   document.querySelectorAll(".grain-switch button").forEach((button) => {
     button.addEventListener("click", () => {
       state.grain = button.dataset.grain;
+      if (state.grain === "monthly") state.month = "All";
       state.selectedDate = null;
       render(rows);
     });

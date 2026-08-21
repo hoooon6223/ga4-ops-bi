@@ -638,8 +638,7 @@ h2 {
   min-height: 350px;
 }
 
-.eda-chart svg,
-.spark svg {
+.eda-chart svg {
   display: block;
   width: 100%;
   height: 100%;
@@ -695,39 +694,32 @@ h2 {
 }
 
 .day-detail dd {
+  display: grid;
+  justify-items: end;
+  gap: 3px;
   margin: 0;
   font-weight: 900;
 }
 
-.spark-grid {
-  display: grid;
-  gap: 12px;
+.day-detail dd strong {
+  font-size: 15px;
 }
 
-.spark-card {
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  align-items: center;
-  min-height: 72px;
-  gap: 12px;
-}
-
-.spark-card span {
-  color: var(--muted);
-  font-size: 12px;
+.day-detail dd span {
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
   font-weight: 900;
 }
 
-.spark {
-  height: 72px;
+.day-detail dd .up {
+  color: #147a54;
+  background: #e9f8f1;
 }
 
-.spark .axis,
-.spark circle,
-.spark .value-label,
-.spark .extreme-label,
-.spark .y-axis {
-  display: none;
+.day-detail dd .down {
+  color: #c94343;
+  background: #fff0f0;
 }
 
 .weekday-bars {
