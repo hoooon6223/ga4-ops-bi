@@ -95,7 +95,7 @@ function aggregateRows(rows, month) {
     ...total,
     session_cvr: total.sessions ? total.purchase_sessions / total.sessions : 0,
     user_cvr: total.users ? total.purchasers / total.users : 0,
-    aov: total.orders ? total.revenue / total.orders : 0,
+    aov: total.purchase_sessions ? total.revenue / total.purchase_sessions : 0,
     revenue_per_session: total.sessions ? total.revenue / total.sessions : 0,
   };
 }
@@ -122,7 +122,7 @@ function dailySeriesFromSegments(rows) {
     .map((row) => ({
       ...row,
       session_cvr: row.sessions ? row.purchase_sessions / row.sessions : 0,
-      aov: row.orders ? row.revenue / row.orders : 0,
+      aov: row.purchase_sessions ? row.revenue / row.purchase_sessions : 0,
       revenue_per_session: row.sessions ? row.revenue / row.sessions : 0,
     }));
 }

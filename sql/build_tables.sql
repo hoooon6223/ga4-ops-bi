@@ -24,7 +24,7 @@ daily AS (
     COUNT(DISTINCT user_pseudo_id) AS users,
     COUNT(DISTINCT IF(event_name = 'purchase', user_pseudo_id, NULL)) AS purchasers,
     COUNT(DISTINCT IF(event_name = 'purchase', session_id, NULL)) AS purchase_sessions,
-    COUNTIF(event_name = 'purchase') AS orders,
+    COUNT(DISTINCT IF(event_name = 'purchase', session_id, NULL)) AS orders,
     SUM(IF(event_name = 'purchase', purchase_revenue, 0)) AS revenue
   FROM base_events
   GROUP BY event_dt
@@ -39,7 +39,7 @@ SELECT
   revenue,
   SAFE_DIVIDE(purchase_sessions, sessions) AS session_cvr,
   SAFE_DIVIDE(purchasers, users) AS user_cvr,
-  SAFE_DIVIDE(revenue, orders) AS aov,
+  SAFE_DIVIDE(revenue, purchase_sessions) AS aov,
   SAFE_DIVIDE(revenue, sessions) AS revenue_per_session
 FROM daily;
 
@@ -140,7 +140,7 @@ monthly AS (
     COUNT(DISTINCT user_pseudo_id) AS users,
     COUNT(DISTINCT IF(event_name = 'purchase', user_pseudo_id, NULL)) AS purchasers,
     COUNT(DISTINCT IF(event_name = 'purchase', session_id, NULL)) AS purchase_sessions,
-    COUNTIF(event_name = 'purchase') AS orders,
+    COUNT(DISTINCT IF(event_name = 'purchase', session_id, NULL)) AS orders,
     SUM(IF(event_name = 'purchase', purchase_revenue, 0)) AS revenue
   FROM base_events
   GROUP BY month
@@ -155,7 +155,7 @@ SELECT
   revenue,
   SAFE_DIVIDE(purchase_sessions, sessions) AS session_cvr,
   SAFE_DIVIDE(purchasers, users) AS user_cvr,
-  SAFE_DIVIDE(revenue, orders) AS aov,
+  SAFE_DIVIDE(revenue, purchase_sessions) AS aov,
   SAFE_DIVIDE(revenue, sessions) AS revenue_per_session
 FROM monthly;
 
@@ -237,7 +237,7 @@ aggregated AS (
     COUNT(DISTINCT b.user_pseudo_id) AS users,
     COUNT(DISTINCT IF(b.event_name = 'purchase', b.user_pseudo_id, NULL)) AS purchasers,
     COUNT(DISTINCT IF(b.event_name = 'purchase', b.session_id, NULL)) AS purchase_sessions,
-    COUNTIF(b.event_name = 'purchase') AS orders,
+    COUNT(DISTINCT IF(b.event_name = 'purchase', b.session_id, NULL)) AS orders,
     SUM(IF(b.event_name = 'purchase', b.purchase_revenue, 0)) AS revenue
   FROM base_events b
   LEFT JOIN user_first_visit u
@@ -260,6 +260,6 @@ SELECT
   revenue,
   SAFE_DIVIDE(purchase_sessions, sessions) AS session_cvr,
   SAFE_DIVIDE(purchasers, users) AS user_cvr,
-  SAFE_DIVIDE(revenue, orders) AS aov,
+  SAFE_DIVIDE(revenue, purchase_sessions) AS aov,
   SAFE_DIVIDE(revenue, sessions) AS revenue_per_session
 FROM aggregated;

@@ -27,13 +27,21 @@ GA4 샘플 데이터 기간:
 - Session CVR: 1.59% → 0.94% (**-0.64pp**)
 - AOV: 65.96 → 47.63 (**-27.8%**)
 
-다만 `transaction_id`는 품질 이슈가 있으므로 주문 수는 해석에 주의한다.
+다만 `transaction_id`와 purchase event count는 품질/중복 이슈가 있으므로, 이 프로젝트의 주문 수는 구매 세션 기준으로 재정의한다.
 
 - purchase event count: 5,692
 - distinct transaction_id: 4,452
 - duplicate transaction_id count: 327
 
 따라서 이 포트폴리오의 핵심 진단 지표는 Revenue, Session CVR, AOV, Revenue per Session으로 둔다.
+
+최종 KPI mart 정의:
+
+`orders = purchase_sessions`
+
+`AOV = revenue / purchase_sessions`
+
+`Revenue = Sessions x Session CVR x AOV`
 
 ## 이 케이스가 적절한 이유
 

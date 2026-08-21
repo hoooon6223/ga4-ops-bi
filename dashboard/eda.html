@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GA4 KPI Mart EDA</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="eda-page">
+    <main class="eda-shell">
+      <header class="eda-header">
+        <div>
+          <p class="eyebrow">Daily KPI Mart · EDA</p>
+          <h1>Revenue Pattern Explorer</h1>
+          <p class="eda-subtitle">매출 변화 시점과 원인을 Sessions × CVR × AOV 구조로 빠르게 확인한다.</p>
+        </div>
+        <label class="eda-select">
+          <span>Month</span>
+          <select id="month-select"></select>
+        </label>
+      </header>
+
+      <section id="eda-kpis" class="eda-kpis" aria-label="Selected period KPI"></section>
+
+      <section class="eda-layout">
+        <article class="eda-panel primary">
+          <div class="panel-head">
+            <div>
+              <h2>Daily Trend</h2>
+              <p>실선은 일별 지표, 점선은 7일 이동평균</p>
+            </div>
+            <div class="metric-switch" id="metric-switch"></div>
+          </div>
+          <div id="main-trend" class="eda-chart"></div>
+        </article>
+
+        <article class="eda-panel">
+          <div class="panel-head">
+            <div>
+              <h2>Selected Day</h2>
+              <p>차트의 점 또는 anomaly row 클릭</p>
+            </div>
+          </div>
+          <div id="day-detail" class="day-detail"></div>
+        </article>
+
+        <article class="eda-panel">
+          <div class="panel-head">
+            <div>
+              <h2>Revenue Drivers</h2>
+              <p>Revenue = Sessions × CVR × AOV</p>
+            </div>
+          </div>
+          <div id="driver-sparklines" class="spark-grid"></div>
+        </article>
+
+        <article class="eda-panel">
+          <div class="panel-head">
+            <div>
+              <h2>Weekday Seasonality</h2>
+              <p>요일별 평균 매출</p>
+            </div>
+          </div>
+          <div id="weekday-bars" class="weekday-bars"></div>
+        </article>
+
+        <article class="eda-panel wide">
+          <div class="panel-head">
+            <div>
+              <h2>Anomaly Candidates</h2>
+              <p>7일 이동평균 대비 revenue gap이 큰 일자</p>
+            </div>
+          </div>
+          <div id="anomaly-table" class="anomaly-table"></div>
+        </article>
+      </section>
+    </main>
+    <script src="./eda.js"></script>
+  </body>
+</html>

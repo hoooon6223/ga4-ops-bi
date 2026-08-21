@@ -34,12 +34,13 @@ BigQuery public dataset:
 
 ## 지표 정의 메모
 
-`orders`는 distinct transaction ID가 아니라 purchase event count로 정의한다.
+`orders`는 purchase event count가 아니라 **구매가 발생한 distinct session count**로 정의한다.
 
 이유:
-- 샘플 데이터에 중복 transaction ID가 있다.
-- 일부 transaction ID는 `(not set)` 같은 placeholder 값이다.
-- transaction ID 품질은 핵심 주문 지표가 아니라 data quality check 항목으로 관리한다.
+- 이 프로젝트에서는 운영 KPI 해석을 단순화하기 위해 한 세션의 구매를 최대 1건으로 본다.
+- 따라서 `orders = purchase_sessions`로 정의한다.
+- 이 정의에서는 `Revenue = Sessions x Session CVR x AOV`가 정확히 성립한다.
+- transaction ID와 purchase event 중복은 data quality check 항목으로만 관리한다.
 
 ## Grain 결정
 
@@ -97,7 +98,8 @@ Looker Studio UI 배치와 별도로, 포트폴리오 화면 퀄리티를 빠르
 주의:
 - 전체 월별 KPI는 exact monthly mart 기준이다.
 - Channel/Device/User Type drill-down은 `daily_segment_mart`의 daily grain을 선택 기간 안에서 합산한 방향성 분석용이다.
-- 1월 Revenue 하락은 원천 BigQuery 월별 exact 집계에서도 확인되지만, `transaction_id` 품질 이슈가 있어 주문 수보다 Revenue, Session CVR, AOV 중심으로 해석한다.
+- 1월 Revenue 하락은 원천 BigQuery 월별 exact 집계에서도 확인된다.
+- purchase event와 transaction ID에는 중복이 있으므로, 이 프로젝트의 `orders`는 purchase event count가 아니라 purchase session count로 정의한다.
 
 ## Looker Studio 대시보드 구성
 

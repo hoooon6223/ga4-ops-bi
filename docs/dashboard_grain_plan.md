@@ -28,15 +28,17 @@ Revenue = Sessions x CVR x AOV
 정의:
 - Sessions: distinct `user_pseudo_id + ga_session_id`
 - Purchasers: `purchase`가 발생한 distinct user
-- Orders: purchase event count
+- Orders: 구매가 발생한 distinct session count
 - Revenue: `ecommerce.purchase_revenue`
 - CVR: purchase sessions / sessions
-- AOV: revenue / orders
+- AOV: revenue / purchase_sessions
 - Revenue per Session: revenue / sessions
 
 메모:
 - 이 GA4 샘플에는 중복 transaction ID와 `(not set)` 같은 placeholder ID가 있다.
-- 대시보드 안정성을 위해 orders는 purchase event count로 정의하고, transaction ID 품질은 DQ check에서 별도로 다룬다.
+- 대시보드 해석 안정성을 위해 orders는 purchase event count가 아니라 purchase session count로 정의한다.
+- 이 정의에서 `orders = purchase_sessions`이며 `Revenue = Sessions x CVR x AOV`가 성립한다.
+- transaction ID와 purchase event 중복은 DQ check에서 별도로 다룬다.
 
 ## Looker Studio 페이지
 

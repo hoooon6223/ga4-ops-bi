@@ -53,16 +53,16 @@ CONCAT(
 | `users` | 해당 일자의 distinct user_pseudo_id |
 | `purchasers` | 해당 일자에 purchase event가 발생한 distinct user_pseudo_id |
 | `purchase_sessions` | 해당 일자에 purchase event가 발생한 distinct session_id |
-| `orders` | purchase event count |
+| `orders` | 구매가 발생한 distinct session count |
 | `revenue` | purchase event의 `ecommerce.purchase_revenue` 합계 |
 | `session_cvr` | purchase_sessions / sessions |
 | `user_cvr` | purchasers / users |
-| `aov` | revenue / orders |
+| `aov` | revenue / purchase_sessions |
 | `revenue_per_session` | revenue / sessions |
 
 ## 집계 시 주의점
 
-`orders`와 `revenue`는 현재 정의상 기간 합산이 가능하다.
+`orders`와 `revenue`는 현재 정의상 기간 합산이 가능하다. 단, `orders`는 purchase event count가 아니라 purchase session count다.
 
 반면 아래 지표는 distinct count 기반이므로, daily mart를 월/전체 기간으로 단순 합산하면 중복이 생길 수 있다.
 
@@ -81,7 +81,7 @@ CONCAT(
 - `daily_kpi_mart`를 그대로 사용한다.
 
 월별 Revenue, Orders, AOV:
-- `SUM(revenue)`, `SUM(orders)`, `SUM(revenue) / SUM(orders)` 사용 가능.
+- `SUM(revenue)`, `SUM(orders)`, `SUM(revenue) / SUM(purchase_sessions)` 사용 가능.
 
 월별 Sessions, CVR:
 - 빠른 운영 모니터링에서는 daily mart 합산 기반 근사치를 사용할 수 있다.
