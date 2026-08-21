@@ -26,6 +26,7 @@ BigQuery public dataset:
 | `daily_funnel_mart` | date x device x source/medium/channel | 2,351 | 퍼널 진단 |
 | `daily_segment_mart` | date x device x source/medium/channel x user type | 4,320 | 세그먼트 drill-down |
 | `monthly_kpi_mart` | month | 3 | 월별 KPI 비교 |
+| `current_month_kpi_mart` | current month | 1 | 상단 scorecard 및 MoM 비교 |
 
 데이터 기간:
 - 2020-11-01 to 2021-01-31
@@ -77,6 +78,19 @@ BigQuery public dataset:
 
 7. `sql/06_monthly_kpi_mart.sql`
    - Looker Studio 월별 KPI 비교용 mart 생성
+
+8. `sql/07_current_month_kpi_mart.sql`
+   - 현재 분석 월과 전월을 비교하는 scorecard용 mart 생성
+
+## 자동 생성 대시보드
+
+Looker Studio UI 배치와 별도로, 포트폴리오 화면 퀄리티를 빠르게 맞추기 위해 정적 HTML 대시보드를 추가했다.
+
+- 위치: `dashboard/index.html`
+- 데이터: `data/daily_kpi_mart.csv`, `data/monthly_kpi_mart.csv`, `data/daily_segment_mart.csv`
+- 구성: Executive KPI, Revenue Trend, KPI Decomposition, Conversion Signal, Segment Risk, Diagnosis Note
+
+상단 KPI는 월별 distinct grain 이슈를 피하기 위해 `monthly_kpi_mart` 기준으로 계산하고, 일별 추세 차트는 `daily_kpi_mart`를 사용한다.
 
 ## Looker Studio 대시보드 구성
 

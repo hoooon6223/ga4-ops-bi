@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GA4 Operations KPI Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <aside class="sidebar">
+        <div class="brand">ga4 ops</div>
+        <nav class="side-nav" aria-label="Dashboard navigation">
+          <button class="active" type="button">
+            <span class="icon">↗</span>
+            Reports
+          </button>
+          <button type="button">
+            <span class="icon">▦</span>
+            Mart
+          </button>
+          <button type="button">
+            <span class="icon">◎</span>
+            Quality
+          </button>
+          <button type="button">
+            <span class="icon">⚙</span>
+            Action
+          </button>
+        </nav>
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">GA4 Merchandise Store</p>
+            <h1>Operations KPI Dashboard</h1>
+          </div>
+          <button class="download" type="button">Portfolio View</button>
+        </header>
+
+        <div class="tabs" aria-label="Report sections">
+          <button class="active" type="button">Overview</button>
+          <button type="button">Revenue</button>
+          <button type="button">Conversion</button>
+          <button type="button">Segments</button>
+        </div>
+
+        <section class="filters" aria-label="Dashboard filters">
+          <div class="select-card">
+            <span>Timeframe</span>
+            <strong>2020.11 - 2021.01</strong>
+          </div>
+          <div class="select-card">
+            <span>Current month</span>
+            <strong>2021.01</strong>
+          </div>
+          <div class="select-card">
+            <span>Benchmark</span>
+            <strong>Previous month</strong>
+          </div>
+          <div class="select-card">
+            <span>Grain</span>
+            <strong>Daily / Monthly</strong>
+          </div>
+        </section>
+
+        <section class="kpi-grid" id="kpi-grid" aria-label="Current month KPI cards"></section>
+
+        <section class="main-grid">
+          <article class="panel wide">
+            <div class="panel-head">
+              <div>
+                <h2>Revenue Trend</h2>
+                <p>Revenue = Sessions × Session CVR × AOV</p>
+              </div>
+              <span class="badge danger">Jan drop detected</span>
+            </div>
+            <div id="revenue-chart" class="chart"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>KPI Decomposition</h2>
+                <p>Dec 2020 → Jan 2021</p>
+              </div>
+            </div>
+            <div id="decomp-bars" class="decomp"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Conversion Signal</h2>
+                <p>Daily session CVR movement</p>
+              </div>
+            </div>
+            <div id="cvr-chart" class="chart compact"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Segment Risk</h2>
+                <p>Revenue loss concentration</p>
+              </div>
+            </div>
+            <div id="segment-table" class="segment-list"></div>
+          </article>
+
+          <article class="panel insight">
+            <div class="panel-head">
+              <div>
+                <h2>Diagnosis Note</h2>
+                <p>Operational readout</p>
+              </div>
+            </div>
+            <div class="insight-body">
+              <strong>2021년 1월 매출 하락은 트래픽 감소만으로 설명하기 어렵다.</strong>
+              <p>
+                Sessions는 전월 대비 감소했지만, Session CVR과 AOV가 동시에 악화되며
+                Revenue per Session이 크게 하락했다. 다음 분석은 CVR 하락이 특정
+                디바이스, 채널, 유저 타입 또는 퍼널 단계에 집중되는지 확인하는
+                방향으로 확장한다.
+              </p>
+              <div class="action-row">
+                <span>Next action</span>
+                <b>하락 기여도가 큰 device / channel / user type 기준으로 funnel step 재정의 후 drill-down</b>
+              </div>
+            </div>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
