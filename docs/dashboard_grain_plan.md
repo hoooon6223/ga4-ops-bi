@@ -6,7 +6,7 @@
 
 이유:
 - 운영 대시보드는 일 단위 모니터링을 지원해야 한다.
-- daily mart는 Tableau에서 week/month 단위로 쉽게 집계할 수 있다.
+- daily mart는 Looker Studio에서 week/month 단위로 쉽게 집계할 수 있다.
 - 일별 추세를 보면 KPI 하락, spike, 요일 효과를 확인하기 좋다.
 - 데이터 기간이 2020-11-01부터 2021-01-31까지 3개월이므로, 월별 비교는 장기 추세 분석이 아니라 단기 이슈 진단으로 해석해야 한다.
 
@@ -38,7 +38,7 @@ Revenue = Sessions x CVR x AOV
 - 이 GA4 샘플에는 중복 transaction ID와 `(not set)` 같은 placeholder ID가 있다.
 - 대시보드 안정성을 위해 orders는 purchase event count로 정의하고, transaction ID 품질은 DQ check에서 별도로 다룬다.
 
-## Tableau 페이지
+## Looker Studio 페이지
 
 1. Executive Monitoring
    - Revenue, Sessions, CVR, AOV, Orders, Purchasers

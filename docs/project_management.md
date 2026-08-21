@@ -42,8 +42,8 @@ bigquery-457902
 - `data/`
 
 메모:
-- `data/` 안의 CSV 파일은 Tableau에 바로 연결할 수 있는 export 파일이다.
-- Tableau workbook이나 큰 dashboard export 파일은 필요 시 `.gitignore`로 제외한다.
+- `data/` 안의 CSV 파일은 BI 도구에 바로 연결할 수 있는 export 파일이다.
+- Looker Studio는 BigQuery table에 직접 연결하는 것을 기본 방식으로 사용한다.
 
 ## GitHub
 

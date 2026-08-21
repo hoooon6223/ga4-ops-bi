@@ -2,7 +2,7 @@
 
 프로젝트 방향:
 
-> GA4 Merchandise Store 이벤트 데이터를 BigQuery SQL로 가공해 운영 KPI mart를 만들고, Tableau에서 이커머스 KPI를 모니터링하며 CVR 하락 이슈를 퍼널/세그먼트 단위로 진단한다.
+> GA4 Merchandise Store 이벤트 데이터를 BigQuery SQL로 가공해 운영 KPI mart를 만들고, Looker Studio에서 이커머스 KPI를 모니터링하며 CVR 하락 이슈를 퍼널/세그먼트 단위로 진단한다.
 
 ## 데이터 소스
 
@@ -25,6 +25,7 @@ BigQuery public dataset:
 | `daily_kpi_mart` | date | 92 | 핵심 KPI 모니터링 |
 | `daily_funnel_mart` | date x device x source/medium/channel | 2,351 | 퍼널 진단 |
 | `daily_segment_mart` | date x device x source/medium/channel x user type | 4,320 | 세그먼트 drill-down |
+| `monthly_kpi_mart` | month | 3 | 월별 KPI 비교 |
 
 데이터 기간:
 - 2020-11-01 to 2021-01-31
@@ -45,7 +46,7 @@ BigQuery public dataset:
 
 이유:
 - 운영 BI는 일 단위 모니터링이 자연스럽다.
-- daily row를 Tableau에서 week/month로 집계할 수 있다.
+- daily row를 Looker Studio에서 week/month로 집계할 수 있다.
 - 일별 추세를 보면 spike/drop과 요일 패턴을 확인하기 쉽다.
 - 데이터가 3개월뿐이므로 월간 장기 추세가 아니라 월별 KPI 이슈 진단으로 활용하는 것이 적절하다.
 
@@ -74,7 +75,10 @@ BigQuery public dataset:
 6. `sql/build_tables.sql`
    - `bigquery-457902.ga4_ops_bi` 안의 관리용 mart 테이블을 생성/갱신
 
-## Tableau 대시보드 구성
+7. `sql/06_monthly_kpi_mart.sql`
+   - Looker Studio 월별 KPI 비교용 mart 생성
+
+## Looker Studio 대시보드 구성
 
 추천 페이지:
 

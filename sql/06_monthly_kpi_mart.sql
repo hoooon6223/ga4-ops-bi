@@ -1,15 +1,13 @@
--- BI dataset: daily_kpi_mart
--- Grain: one row per date.
+-- Looker Studio dataset: monthly_kpi_mart
+-- Grain: one row per month.
+-- Purpose: exact monthly KPI comparison without summing daily distinct counts.
 
-DECLARE start_date STRING DEFAULT '20201101';
-DECLARE end_date STRING DEFAULT '20210131';
-
+CREATE OR REPLACE TABLE `bigquery-457902.ga4_ops_bi.monthly_kpi_mart` AS
 WITH base_events AS (
   SELECT
-    PARSE_DATE('%Y%m%d', event_date) AS event_dt,
+    DATE_TRUNC(PARSE_DATE('%Y%m%d', event_date), MONTH) AS month,
     user_pseudo_id,
     event_name,
-    ecommerce.transaction_id AS transaction_id,
     ecommerce.purchase_revenue AS purchase_revenue,
     CONCAT(
       user_pseudo_id,
@@ -17,11 +15,11 @@ WITH base_events AS (
       CAST((SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'ga_session_id') AS STRING)
     ) AS session_id
   FROM `bigquery-public-data.ga4_obfuscated_sample_ecommerce.events_*`
-  WHERE _TABLE_SUFFIX BETWEEN start_date AND end_date
+  WHERE _TABLE_SUFFIX BETWEEN '20201101' AND '20210131'
 ),
-daily AS (
+monthly AS (
   SELECT
-    event_dt,
+    month,
     COUNT(DISTINCT session_id) AS sessions,
     COUNT(DISTINCT user_pseudo_id) AS users,
     COUNT(DISTINCT IF(event_name = 'purchase', user_pseudo_id, NULL)) AS purchasers,
@@ -29,10 +27,10 @@ daily AS (
     COUNTIF(event_name = 'purchase') AS orders,
     SUM(IF(event_name = 'purchase', purchase_revenue, 0)) AS revenue
   FROM base_events
-  GROUP BY event_dt
+  GROUP BY month
 )
 SELECT
-  event_dt AS date,
+  month,
   sessions,
   users,
   purchasers,
@@ -43,5 +41,6 @@ SELECT
   SAFE_DIVIDE(purchasers, users) AS user_cvr,
   SAFE_DIVIDE(revenue, orders) AS aov,
   SAFE_DIVIDE(revenue, sessions) AS revenue_per_session
-FROM daily
-ORDER BY date;
+FROM monthly
+ORDER BY month;
+

@@ -1,4 +1,4 @@
--- Tableau dataset: daily_funnel_mart
+-- BI dataset: daily_funnel_mart
 -- Grain: one row per date, device, channel.
 -- Funnel is session-based: a session is counted in a step if the event occurred at least once.
 
@@ -79,4 +79,3 @@ SELECT
   SAFE_DIVIDE(purchase_sessions, sessions) AS session_to_purchase_rate
 FROM aggregated
 ORDER BY date, device_category, channel_group, source_medium;
-

@@ -2,7 +2,7 @@
 
 ## 목적
 
-`daily_kpi_mart`는 Tableau Executive Monitoring 대시보드의 기본 테이블이다.
+`daily_kpi_mart`는 Looker Studio Executive Monitoring 대시보드의 기본 테이블이다.
 
 이 테이블의 목적은 다음 질문에 답하는 것이다.
 
@@ -92,4 +92,3 @@ CONCAT(
 ```text
 sql/05_kpi_mart_validation.sql
 ```
-

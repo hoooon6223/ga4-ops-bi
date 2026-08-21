@@ -1,4 +1,4 @@
--- Tableau dataset: daily_segment_mart
+-- BI dataset: daily_segment_mart
 -- Grain: one row per date, device, channel, source/medium, user type.
 
 DECLARE start_date STRING DEFAULT '20201101';
