@@ -31,8 +31,10 @@ EXPORTS = {
 
 
 def next_run_date():
+    # A day counts as done only when the last step (quality checks) is written, so a run that
+    # failed partway is retried on the next run instead of being skipped.
     try:
-        last = bq.rows(bq.query_csv(f"SELECT MAX(kpi_date) AS d FROM {DS}.ops_kpi_daily`"))[0]["d"]
+        last = bq.rows(bq.query_csv(f"SELECT MAX(dq_date) AS d FROM {DS}.ops_dq_results`"))[0]["d"]
     except RuntimeError as e:
         if "Not found" not in str(e):
             raise

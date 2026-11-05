@@ -14,6 +14,9 @@ CREATE TABLE IF NOT EXISTS `bigquery-457902.ga4_ops_bi.ops_dq_results` (
 )
 PARTITION BY dq_date;
 
+-- Delete + insert are one transaction: a failure leaves the day's previous rows untouched.
+BEGIN TRANSACTION;
+
 DELETE FROM `bigquery-457902.ga4_ops_bi.ops_dq_results` WHERE dq_date = @run_date;
 
 INSERT INTO `bigquery-457902.ga4_ops_bi.ops_dq_results`
@@ -102,3 +105,5 @@ SELECT
   detail,
   CURRENT_TIMESTAMP() AS loaded_at
 FROM checks;
+
+COMMIT TRANSACTION;

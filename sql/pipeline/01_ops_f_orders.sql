@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS `bigquery-457902.ga4_ops_bi.ops_f_orders` (
 )
 PARTITION BY order_date;
 
+-- Delete + insert are one transaction: a failure leaves the day's previous rows untouched.
+BEGIN TRANSACTION;
+
 DELETE FROM `bigquery-457902.ga4_ops_bi.ops_f_orders` WHERE order_date = @run_date;
 
 INSERT INTO `bigquery-457902.ga4_ops_bi.ops_f_orders`
@@ -80,3 +83,5 @@ WHERE order_key NOT IN (
   FROM `bigquery-457902.ga4_ops_bi.ops_f_orders`
   WHERE order_date < @run_date
 );
+
+COMMIT TRANSACTION;

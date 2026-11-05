@@ -29,6 +29,9 @@ CREATE TABLE IF NOT EXISTS `bigquery-457902.ga4_ops_bi.ops_kpi_comparison` (
 )
 PARTITION BY kpi_date;
 
+-- Delete + insert are one transaction: a failure leaves the day's previous rows untouched.
+BEGIN TRANSACTION;
+
 DELETE FROM `bigquery-457902.ga4_ops_bi.ops_kpi_comparison` WHERE kpi_date = @run_date;
 
 INSERT INTO `bigquery-457902.ga4_ops_bi.ops_kpi_comparison`
@@ -149,3 +152,5 @@ SELECT
   END AS flag,
   CURRENT_TIMESTAMP() AS loaded_at
 FROM chg;
+
+COMMIT TRANSACTION;

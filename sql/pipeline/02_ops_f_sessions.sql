@@ -21,6 +21,9 @@ CREATE TABLE IF NOT EXISTS `bigquery-457902.ga4_ops_bi.ops_f_sessions` (
 )
 PARTITION BY session_date;
 
+-- Delete + insert are one transaction: a failure leaves the day's previous rows untouched.
+BEGIN TRANSACTION;
+
 DELETE FROM `bigquery-457902.ga4_ops_bi.ops_f_sessions` WHERE session_date = @run_date;
 
 INSERT INTO `bigquery-457902.ga4_ops_bi.ops_f_sessions`
@@ -77,3 +80,5 @@ SELECT
   CURRENT_TIMESTAMP() AS loaded_at
 FROM s
 LEFT JOIN o USING (session_id);
+
+COMMIT TRANSACTION;
