@@ -208,10 +208,10 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
       <h2>AI 일일 코멘트</h2>
       <div class="banner"><span class="dot warning">!</span><span>일부 품질 체크에 경고가 있어요. 관련 지표는 해석에 주의하세요.</span></div>
       
-        <p class="ai-headline">매출, 주문 수, 세션 전환율, 장바구니율이 최근 7일 기준 직전 7일보다 올랐고, 매출 누락률 체크가 WARN(10.3%)이라 매출과 객단가는 해석 보류예요.</p>
-        <h3>주목할 변화</h3><ul><li>주문 수가 최근 7일 기준 직전 7일 대비 +37.2% 변했어요.</li><li>세션 전환율이 최근 7일 기준 직전 7일 대비 +0.37%p 변했어요.</li><li>장바구니율이 최근 7일 기준 직전 7일 대비 +6.86%p 변했어요.</li></ul>
-        <h3>확인할 것</h3><ul><li>매출: 최근 7일 기준 +43.7% 변해 임계치를 넘었지만, 매출 누락률 WARN(10.3%)으로 해석 보류예요.</li><li>객단가: 매출 누락률 WARN으로 해석 보류예요.</li><li>장바구니율: 최근 7일 변화 +6.86%p로 임계치를 넘었어요.</li></ul>
-        <h3>데이터 품질</h3><p class="note">매출 누락률 체크가 WARN(10.3%)이고 나머지 체크는 모두 PASS예요. 매출과 객단가는 해석 보류예요.</p>
+        <p class="ai-headline">매출, 주문 수, 세션 전환율, 장바구니율이 최근 7일 vs 직전 7일 기준 상승해 주목 판정이고, 매출 누락률 WARN(10.3%)으로 매출은 해석 보류예요.</p>
+        <h3>주목할 변화</h3><ul><li>주문 수가 최근 7일 vs 직전 7일 기준 +37.2% 늘어 주목 판정이에요.</li><li>세션 전환율이 최근 7일 vs 직전 7일 기준 +0.37%p 올라 주목 판정이에요.</li><li>장바구니율이 최근 7일 vs 직전 7일 기준 +6.86%p 올라 주목 판정이에요.</li></ul>
+        <h3>확인할 것</h3><ul><li>매출: 최근 7일 vs 직전 7일 기준 +43.7%로 주목 판정이지만, 매출 누락률이 WARN(10.3%)이라 해석 보류예요.</li><li>객단가: 매출 누락률 WARN(10.3%)으로 해석 보류 대상이에요.</li><li>장바구니율: 지난주 같은 요일 값이 영이라 같은 요일 비교 기준이 없어요.</li></ul>
+        <h3>데이터 품질</h3><p class="note">매출 누락률 체크가 WARN(10.3%)이고 나머지 체크는 모두 통과예요. 매출과 객단가는 해석 보류예요.</p>
         <p class="meta">claude-opus-5-5가 작성했어요. 문장 속 숫자는 모두 SQL 집계 결과에서 채워 넣었어요.</p>
       
     </div>
@@ -390,7 +390,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
     <p class="note" style="margin-top:8px">DQ는 데이터 품질 체크, R은 같은 숫자를 다른 단위로 계산해 맞춰보는 대사 규칙이에요. 하나라도 실패하면 그날 리포트는 해석 보류로 표시돼요.</p>
   </div>
 </section>
-<footer>생성 2026-11-05 08:17 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
+<footer>생성 2026-11-05 08:23 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
 </main>
 
 <nav class="tabs">
