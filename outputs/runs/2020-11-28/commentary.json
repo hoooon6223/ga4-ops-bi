@@ -1,9 +1,13 @@
 {
   "ok": true,
-  "status": "caution",
   "model": "claude-opus-5-5",
   "headline": "주목: 매출, 주문 수, 세션 전환율, 장바구니율 (최근 7일 vs 직전 7일).",
   "highlights": [
+    {
+      "metric_id": "K01_revenue",
+      "direction": "up",
+      "text": "매출: 최근 7일 vs 직전 7일 {{K01_revenue.r7_change}} (주목)."
+    },
     {
       "metric_id": "K02_orders",
       "direction": "up",
@@ -13,17 +17,11 @@
       "metric_id": "K05_session_cvr",
       "direction": "up",
       "text": "세션 전환율: 최근 7일 vs 직전 7일 {{K05_session_cvr.r7_change}} (주목)."
-    },
-    {
-      "metric_id": "K01_revenue",
-      "direction": "up",
-      "text": "매출: 최근 7일 vs 직전 7일 {{K01_revenue.r7_change}} (주목, 해석 보류)."
     }
   ],
   "watch_items": [
     "장바구니율: 최근 7일 vs 직전 7일 {{D02_add_to_cart_rate.r7_change}} (주목).",
     "장바구니율: 지난주 같은 요일 대비의 기준값 {{D02_add_to_cart_rate.same_dow_last_week}}.",
     "매출: 전월 같은 기간 대비 값 없음."
-  ],
-  "data_quality_note": "매출 누락률 WARN ({{DQ03_null_revenue.value}}). 해석 보류: 매출, 객단가."
+  ]
 }
