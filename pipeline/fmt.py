@@ -5,7 +5,8 @@ import re
 # How each metric's value is shown. Changes follow the metric's unit in kpi_comparison.csv.
 MONEY = {"K01_revenue", "K06_aov"}
 CHANGE_FIELDS = {"dod_change", "wow_day_change", "r7_change", "mom_change"}
-VALUE_FIELDS = {"value_day", "r7_value", "mtd_value"}
+# Current values and the base values they are compared with (so a comment can say "last week was 0.00%").
+VALUE_FIELDS = {"value_day", "r7_value", "mtd_value", "prev_day", "same_dow_last_week", "r7_prev", "mtd_prev_month"}
 PLACEHOLDER = re.compile(r"\{\{\s*([A-Z0-9a-z_]+)\.([a-z0-9_]+)\s*\}\}")
 
 
