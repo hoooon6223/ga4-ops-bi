@@ -11,7 +11,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from pipeline import fmt
+from pipeline import ai_summary, fmt
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
@@ -147,11 +147,9 @@ def render(run_dir):
         "sessions": line_chart("c-ses", dates, [f(t["sessions"]) for t in trend], "세션", count),
     }
 
-    if commentary.get("ok"):
-        ai = {"ok": True, "headline": fmt.fill(commentary["headline"], table),
-              "highlights": [{**h, "text": fmt.fill(h["text"], table)} for h in commentary["highlights"]],
-              "watch_items": [fmt.fill(w, table) for w in commentary["watch_items"]],
-              "dq_note": fmt.fill(commentary["data_quality_note"], table), "model": commentary.get("model", "")}
+    text = ai_summary.readable(commentary, run_dir)
+    if text:
+        ai = {"ok": True, **text, "model": commentary.get("model", "")}
     else:
         ai = {"ok": False, "reason": commentary.get("reason", ""), "errors": commentary.get("errors", [])}
 
@@ -173,4 +171,22 @@ def render(run_dir):
         (SITE / "index.html").write_text(
             f'<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=days/{day}.html">'
             f'<title>GA4 운영 리포트</title><a href="days/{day}.html">최신 리포트 ({day})</a>')
+    render_report_list(env)
     return page
+
+
+def render_report_list(env):
+    """site/reports.html: one row per day with status and the AI headline."""
+    rows = []
+    for run_dir in sorted(RUNS.iterdir(), reverse=True):
+        c_path = run_dir / "commentary.json"
+        if not c_path.exists():
+            continue
+        c = json.loads(c_path.read_text())
+        text = ai_summary.readable(c, run_dir)
+        d = dt.date.fromisoformat(run_dir.name)
+        rows.append({"day": run_dir.name, "weekday": "월화수목금토일"[d.weekday()], "status": STATUS[c["status"]],
+                     "headline": text["headline"] if text else c.get("reason", ""), "ai_ok": bool(text)})
+    html = env.get_template("reports.html.j2").render(
+        rows=rows, generated=dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"))
+    (SITE / "reports.html").write_text(html)

@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GA4 운영 리포트 목록</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f3f2f1; --card: #ffffff; --bar: #252423; --bar-ink: #ffffff;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+  --series: #2a78d6; --series-soft: #86b6ef; --up: #006300; --down: #d03b3b;
+  --good: #0ca30c; --warning: #fab219; --critical: #d03b3b;
+  --shadow: 0 1px 2px rgba(0,0,0,.08), 0 0 1px rgba(0,0,0,.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --card: #1a1a19; --bar: #000000;
+    --ink: #f0efec; --ink-2: #c3c2b7; --grid: #2c2c2a; --axis: #383835;
+    --border: rgba(255,255,255,0.10); --series: #3987e5; --series-soft: #184f95;
+    --up: #0ca30c; --down: #e66767; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --card: #1a1a19; --bar: #000000;
+  --ink: #f0efec; --ink-2: #c3c2b7; --grid: #2c2c2a; --axis: #383835;
+  --border: rgba(255,255,255,0.10); --series: #3987e5; --series-soft: #184f95;
+  --up: #0ca30c; --down: #e66767; --shadow: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 14px/1.5 "Segoe UI", system-ui, -apple-system, sans-serif; }
+header.topbar { background: var(--bar); color: var(--bar-ink); padding: 10px 16px;
+  display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.topbar h1 { font-size: 15px; font-weight: 600; margin: 0; }
+.topbar .sub { color: #c3c2b7; font-size: 12px; }
+.slicers { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; padding: 12px 16px 0; }
+.slicer { background: var(--card); box-shadow: var(--shadow); border: 1px solid var(--border);
+  border-radius: 4px; padding: 6px 10px; }
+.slicer label { display: block; font-size: 11px; color: var(--ink-2); }
+.slicer select { font: inherit; color: var(--ink); background: transparent; border: 0; padding: 2px 0; min-width: 140px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; white-space: nowrap;
+  padding: 4px 10px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); }
+.dot { width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center;
+  font-size: 11px; font-weight: 700; color: #fff; }
+.dot.good { background: var(--good); } .dot.warning { background: var(--warning); color: #0b0b0b; }
+.dot.critical { background: var(--critical); } .dot.muted { background: var(--muted); }
+main { padding: 12px 16px 72px; max-width: 1400px; }
+.page { display: none; } .page.active { display: grid; gap: 12px; }
+.visual { background: var(--card); box-shadow: var(--shadow); border: 1px solid var(--border);
+  border-radius: 4px; padding: 12px 14px; min-width: 0; }
+.visual h2 { font-size: 13px; font-weight: 600; margin: 0 0 8px; color: var(--ink); }
+.visual .note { font-size: 12px; color: var(--ink-2); margin: 0; }
+.tiles { display: grid; gap: 12px; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.tile .label { font-size: 12px; color: var(--ink-2); display: flex; justify-content: space-between; gap: 6px; }
+.tile .value { font-size: 26px; font-weight: 600; margin: 2px 0; }
+.tile .delta { font-size: 13px; font-weight: 600; }
+.delta.up { color: var(--up); } .delta.down { color: var(--down); } .delta.flat { color: var(--ink-2); }
+.tile .basis, .tile .more { font-size: 11px; color: var(--muted); }
+.flag { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px;
+  background: var(--warning); color: #0b0b0b; white-space: nowrap; }
+.spark { display: block; margin-top: 6px; width: 100%; height: 32px; }
+.spark-line { stroke: var(--series-soft); stroke-width: 2; }
+.spark-dot { fill: var(--series); }
+.row2 { display: grid; gap: 12px; grid-template-columns: 2fr 1fr; }
+.row3 { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+.banner { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 4px;
+  background: var(--page); margin-bottom: 10px; font-size: 13px; }
+.ai-headline { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
+.ai ul { margin: 0 0 8px; padding-left: 18px; } .ai li { margin: 2px 0; }
+.ai h3 { font-size: 12px; color: var(--ink-2); margin: 8px 0 2px; font-weight: 600; }
+.ai .meta { font-size: 11px; color: var(--muted); margin-top: 8px; }
+.decomp { display: grid; gap: 6px; }
+.decomp div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--grid); padding: 4px 0; }
+.decomp .op { color: var(--muted); text-align: center; border: 0; display: block; padding: 0; }
+.num { font-variant-numeric: tabular-nums; }
+.chart { width: 100%; height: auto; display: block; }
+.chart .grid { stroke: var(--grid); stroke-width: 1; } .chart .axis { stroke: var(--axis); stroke-width: 1; }
+.chart .tick { fill: var(--muted); font-size: 10px; }
+.chart .series { stroke: var(--series); stroke-width: 2; stroke-linejoin: round; }
+.chart .xhair { stroke: var(--muted); stroke-width: 1; } .chart .xdot { fill: var(--series); stroke: var(--card); stroke-width: 2; }
+.tip { position: fixed; pointer-events: none; background: var(--card); color: var(--ink); border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,.18); border-radius: 4px; padding: 6px 8px; font-size: 12px; display: none; z-index: 10; }
+.tip strong { display: block; font-size: 14px; }
+.funnel-row { display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; margin: 6px 0; }
+.funnel-bar { height: 22px; background: var(--series); border-radius: 0 4px 4px 0; min-width: 2px; }
+.funnel-meta { font-size: 12px; color: var(--ink-2); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-weight: 600; color: var(--ink-2); font-size: 12px; border-bottom: 1px solid var(--axis); padding: 6px; }
+td { border-bottom: 1px solid var(--grid); padding: 6px; vertical-align: top; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+.table-wrap { overflow-x: auto; }
+nav.tabs { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border);
+  display: flex; gap: 2px; padding: 0 16px; overflow-x: auto; }
+nav.tabs a { padding: 10px 14px; color: var(--ink-2); text-decoration: none; font-size: 13px; white-space: nowrap;
+  border-top: 3px solid transparent; }
+nav.tabs a.active { color: var(--ink); font-weight: 600; border-top-color: var(--warning); }
+footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
+@media (max-width: 1100px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } .row2, .row3 { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tile .value { font-size: 20px; } }
+.print-only { display: none; }
+/* PDF archive: all report pages expanded, one per printed page, screen-only controls hidden */
+@media print {
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { background: #ffffff; font-size: 12px; }
+  main { padding: 8px 0 0; max-width: none; }
+  .page { display: grid !important; gap: 10px; }
+  .page + .page { break-before: page; }
+  .print-only { display: block; font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+  .visual { box-shadow: none; break-inside: avoid; }
+  .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .row2, .row3 { grid-template-columns: 1fr 1fr; }
+  nav.tabs, .tip, .slicer, .screen-only, .xhair, .xdot { display: none !important; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <h1>GA4 Merch Shop · 일별 리포트 목록</h1>
+  <span class="sub">매일 자동 생성된 대시보드를 HTML과 PDF로 보존해요</span>
+</header>
+<main style="padding-bottom: 24px">
+  <div class="visual">
+    <div class="table-wrap"><table>
+      <thead><tr><th>날짜</th><th>데이터 상태</th><th>AI 한 줄 요약</th><th>보기</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-28 (토)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td>최근 7일 매출과 주문이 크게 늘었고, 세션보다는 세션 전환율 상승이 주된 요인이에요. 다만 매출 누락 경고가 있어 매출 해석에는 주의가 필요해요.</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-28.html">HTML</a> · <a href="pdf/2020-11-28.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-27 (금)</td>
+          <td><span class="pill"><span class="dot good">✓</span>정상</span></td>
+          <td class="funnel-meta">AI 요약 실패: Error code: 401 - {&#39;type&#39;: &#39;error&#39;, &#39;error&#39;: {&#39;type&#39;: &#39;authentication_error&#39;, &#39;message&#39;: &#39;invalid x-api-key&#39;}, &#39;request_id&#39;: &#39;req_011CgjQuWPiAh8eQnovtY9gv&#39;}</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-27.html">HTML</a> · <a href="pdf/2020-11-27.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-26 (목)</td>
+          <td><span class="pill"><span class="dot good">✓</span>정상</span></td>
+          <td class="funnel-meta">AI 요약 실패: Error code: 401 - {&#39;type&#39;: &#39;error&#39;, &#39;error&#39;: {&#39;type&#39;: &#39;authentication_error&#39;, &#39;message&#39;: &#39;invalid x-api-key&#39;}, &#39;request_id&#39;: &#39;req_011CgjQQvu3pAdFVnDQ2Kez6&#39;}</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-26.html">HTML</a> · <a href="pdf/2020-11-26.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-25 (수)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약 실패: Error code: 401 - {&#39;type&#39;: &#39;error&#39;, &#39;error&#39;: {&#39;type&#39;: &#39;authentication_error&#39;, &#39;message&#39;: &#39;invalid x-api-key&#39;}, &#39;request_id&#39;: &#39;req_011CgjQ6VLA5X6Wq5JSyLJZG&#39;}</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-25.html">HTML</a> · <a href="pdf/2020-11-25.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-24 (화)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-24.html">HTML</a> · <a href="pdf/2020-11-24.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-23 (월)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-23.html">HTML</a> · <a href="pdf/2020-11-23.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-22 (일)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-22.html">HTML</a> · <a href="pdf/2020-11-22.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-21 (토)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-21.html">HTML</a> · <a href="pdf/2020-11-21.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-20 (금)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-20.html">HTML</a> · <a href="pdf/2020-11-20.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-19 (목)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-19.html">HTML</a> · <a href="pdf/2020-11-19.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-18 (수)</td>
+          <td><span class="pill"><span class="dot good">✓</span>정상</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-18.html">HTML</a> · <a href="pdf/2020-11-18.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-17 (화)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-17.html">HTML</a> · <a href="pdf/2020-11-17.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-16 (월)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-16.html">HTML</a> · <a href="pdf/2020-11-16.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-15 (일)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-15.html">HTML</a> · <a href="pdf/2020-11-15.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-14 (토)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-14.html">HTML</a> · <a href="pdf/2020-11-14.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-13 (금)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-13.html">HTML</a> · <a href="pdf/2020-11-13.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-12 (목)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-12.html">HTML</a> · <a href="pdf/2020-11-12.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-11 (수)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-11.html">HTML</a> · <a href="pdf/2020-11-11.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-10 (화)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-10.html">HTML</a> · <a href="pdf/2020-11-10.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-09 (월)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-09.html">HTML</a> · <a href="pdf/2020-11-09.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-08 (일)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-08.html">HTML</a> · <a href="pdf/2020-11-08.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-07 (토)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-07.html">HTML</a> · <a href="pdf/2020-11-07.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-06 (금)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-06.html">HTML</a> · <a href="pdf/2020-11-06.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-05 (목)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-05.html">HTML</a> · <a href="pdf/2020-11-05.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-04 (수)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-04.html">HTML</a> · <a href="pdf/2020-11-04.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-03 (화)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-03.html">HTML</a> · <a href="pdf/2020-11-03.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-02 (월)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-02.html">HTML</a> · <a href="pdf/2020-11-02.pdf">PDF</a></td>
+        </tr>
+      
+        <tr>
+          <td class="num" style="white-space:nowrap">2020-11-01 (일)</td>
+          <td><span class="pill"><span class="dot warning">!</span>주의</span></td>
+          <td class="funnel-meta">AI 요약을 건너뛰었어요 (--skip-ai).</td>
+          <td style="white-space:nowrap"><a href="days/2020-11-01.html">HTML</a> · <a href="pdf/2020-11-01.pdf">PDF</a></td>
+        </tr>
+      </tbody>
+    </table></div>
+  </div>
+  <footer>생성 2026-11-05 08:05 UTC</footer>
+</main>
+</body>
+</html>

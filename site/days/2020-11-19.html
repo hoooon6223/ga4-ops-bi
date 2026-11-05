@@ -101,6 +101,20 @@ nav.tabs a.active { color: var(--ink); font-weight: 600; border-top-color: var(-
 footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
 @media (max-width: 1100px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } .row2, .row3 { grid-template-columns: 1fr; } }
 @media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tile .value { font-size: 20px; } }
+.print-only { display: none; }
+/* PDF archive: all report pages expanded, one per printed page, screen-only controls hidden */
+@media print {
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { background: #ffffff; font-size: 12px; }
+  main { padding: 8px 0 0; max-width: none; }
+  .page { display: grid !important; gap: 10px; }
+  .page + .page { break-before: page; }
+  .print-only { display: block; font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+  .visual { box-shadow: none; break-inside: avoid; }
+  .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .row2, .row3 { grid-template-columns: 1fr 1fr; }
+  nav.tabs, .tip, .slicer, .screen-only, .xhair, .xdot { display: none !important; }
+}
 </style>
 </head>
 <body>
@@ -113,15 +127,18 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
   <div class="slicer">
     <label for="day">날짜</label>
     <select id="day">
-      <option value="2020-11-23" >2020-11-23</option><option value="2020-11-22" >2020-11-22</option><option value="2020-11-21" >2020-11-21</option><option value="2020-11-20" >2020-11-20</option><option value="2020-11-19" selected>2020-11-19</option><option value="2020-11-18" >2020-11-18</option><option value="2020-11-17" >2020-11-17</option><option value="2020-11-16" >2020-11-16</option><option value="2020-11-15" >2020-11-15</option><option value="2020-11-14" >2020-11-14</option><option value="2020-11-13" >2020-11-13</option><option value="2020-11-12" >2020-11-12</option><option value="2020-11-11" >2020-11-11</option><option value="2020-11-10" >2020-11-10</option><option value="2020-11-09" >2020-11-09</option><option value="2020-11-08" >2020-11-08</option><option value="2020-11-07" >2020-11-07</option><option value="2020-11-06" >2020-11-06</option><option value="2020-11-05" >2020-11-05</option><option value="2020-11-04" >2020-11-04</option><option value="2020-11-03" >2020-11-03</option><option value="2020-11-02" >2020-11-02</option><option value="2020-11-01" >2020-11-01</option>
+      <option value="2020-11-28" >2020-11-28</option><option value="2020-11-27" >2020-11-27</option><option value="2020-11-26" >2020-11-26</option><option value="2020-11-25" >2020-11-25</option><option value="2020-11-24" >2020-11-24</option><option value="2020-11-23" >2020-11-23</option><option value="2020-11-22" >2020-11-22</option><option value="2020-11-21" >2020-11-21</option><option value="2020-11-20" >2020-11-20</option><option value="2020-11-19" selected>2020-11-19</option><option value="2020-11-18" >2020-11-18</option><option value="2020-11-17" >2020-11-17</option><option value="2020-11-16" >2020-11-16</option><option value="2020-11-15" >2020-11-15</option><option value="2020-11-14" >2020-11-14</option><option value="2020-11-13" >2020-11-13</option><option value="2020-11-12" >2020-11-12</option><option value="2020-11-11" >2020-11-11</option><option value="2020-11-10" >2020-11-10</option><option value="2020-11-09" >2020-11-09</option><option value="2020-11-08" >2020-11-08</option><option value="2020-11-07" >2020-11-07</option><option value="2020-11-06" >2020-11-06</option><option value="2020-11-05" >2020-11-05</option><option value="2020-11-04" >2020-11-04</option><option value="2020-11-03" >2020-11-03</option><option value="2020-11-02" >2020-11-02</option><option value="2020-11-01" >2020-11-01</option>
     </select>
   </div>
+  <a class="pill screen-only" href="../reports.html" style="color:inherit;text-decoration:none">일별 리포트 목록</a>
+  <a class="pill screen-only" href="../pdf/2020-11-19.pdf" style="color:inherit;text-decoration:none">PDF 저장본</a>
   <span class="pill"><span class="dot warning">!</span>데이터 상태: 주의</span>
 </div>
 
 <main>
 <!-- Page 1: overview -->
 <section class="page" id="overview">
+  <h2 class="print-only">1. 개요</h2>
   <div class="tiles">
     
     <div class="visual tile">
@@ -191,7 +208,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
       <h2>AI 일일 코멘트</h2>
       <div class="banner"><span class="dot warning">!</span><span>일부 품질 체크에 경고가 있어요. 관련 지표는 해석에 주의하세요.</span></div>
       
-        <p class="note">AI 요약을 건너뛰었어요 (--skip-ai). 아래 숫자는 SQL 집계 결과 그대로라 그대로 볼 수 있어요.</p>
+        <p class="note">AI 요약을 건너뛰었어요 (--skip-ai). 아래 숫자는 SQL 집계 결과 그대로라 정상이에요.</p>
         
       
     </div>
@@ -224,6 +241,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
 
 <!-- Page 2: funnel + metric detail -->
 <section class="page" id="funnel">
+  <h2 class="print-only">2. 퍼널 · 지표 상세</h2>
   <div class="visual">
     <h2>구매 퍼널 (최근 7일 세션)</h2>
     <p class="note" style="margin-bottom:8px">상품 조회 → 체크아웃 → 구매. 장바구니는 건너뛰는 구매(바로 구매)가 많아 퍼널 단계에서 뺐어요.</p>
@@ -311,6 +329,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
 
 <!-- Page 3: data quality -->
 <section class="page" id="quality">
+  <h2 class="print-only">3. 데이터 품질</h2>
   <div class="visual">
     <h2>데이터 품질 체크와 집계 대사</h2>
     <div class="table-wrap"><table>
@@ -368,7 +387,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
     <p class="note" style="margin-top:8px">DQ는 데이터 품질 체크, R은 같은 숫자를 다른 단위로 계산해 맞춰보는 대사 규칙이에요. 하나라도 실패하면 그날 리포트는 해석 보류로 표시돼요.</p>
   </div>
 </section>
-<footer>생성 2026-11-05 07:21 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
+<footer>생성 2026-11-05 08:05 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
 </main>
 
 <nav class="tabs">

@@ -34,6 +34,9 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      - name: Install headless Chromium (dashboard -> PDF)
+        run: python -m playwright install --with-deps chromium
+
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}

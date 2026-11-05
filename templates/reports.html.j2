@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GA4 운영 리포트 목록</title>
+{% include "_style.html" %}
+</head>
+<body>
+<header class="topbar">
+  <h1>GA4 Merch Shop · 일별 리포트 목록</h1>
+  <span class="sub">매일 자동 생성된 대시보드를 HTML과 PDF로 보존해요</span>
+</header>
+<main style="padding-bottom: 24px">
+  <div class="visual">
+    <div class="table-wrap"><table>
+      <thead><tr><th>날짜</th><th>데이터 상태</th><th>AI 한 줄 요약</th><th>보기</th></tr></thead>
+      <tbody>{% for r in rows %}
+        <tr>
+          <td class="num" style="white-space:nowrap">{{ r.day }} ({{ r.weekday }})</td>
+          <td><span class="pill"><span class="dot {{ r.status[0] }}">{{ r.status[1] }}</span>{{ r.status[2] }}</span></td>
+          <td{% if not r.ai_ok %} class="funnel-meta"{% endif %}>{{ r.headline }}</td>
+          <td style="white-space:nowrap"><a href="days/{{ r.day }}.html">HTML</a> · <a href="pdf/{{ r.day }}.pdf">PDF</a></td>
+        </tr>
+      {% endfor %}</tbody>
+    </table></div>
+  </div>
+  <footer>생성 {{ generated }}</footer>
+</main>
+</body>
+</html>

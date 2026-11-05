@@ -30,6 +30,12 @@ class ValidateTest(unittest.TestCase):
         self.assertTrue(ai_summary.validate(comment("{{K01_revenue.mom_change}}"), TABLE, IDS))  # empty value
         self.assertTrue(ai_summary.validate(comment("{{K99_fake.r7_change}}"), TABLE, IDS))
 
+    def test_causal_claim_fails(self):
+        # The comment that prompted this rule: a cause that the data does not show.
+        self.assertTrue(ai_summary.validate(comment("세션 전환율 상승이 주된 요인이에요."), TABLE, IDS))
+        self.assertTrue(ai_summary.validate(comment("실제 매출은 이보다 클 수 있어요."), TABLE, IDS))
+        self.assertEqual(ai_summary.validate(comment("세션 전환율이 {{K05_session_cvr.r7_change}} 변했어요."), TABLE, IDS), [])
+
     def test_unknown_metric_fails(self):
         self.assertTrue(ai_summary.validate(comment("정상이에요.", metric_id="K99_fake"), TABLE, IDS))
 

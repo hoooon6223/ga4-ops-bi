@@ -81,6 +81,10 @@ def main(argv=None):
 
     page = render_dashboard.render(run_dir)
     print(f"[{run_date}] dashboard -> {page.relative_to(ROOT)}")
+
+    from pipeline import export_pdf
+    pdf = export_pdf.export([str(run_date)])[0]
+    print(f"[{run_date}] pdf -> {pdf.relative_to(ROOT)}")
     return 0
 
 
