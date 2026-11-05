@@ -72,8 +72,7 @@ def main(argv=None):
 
     from pipeline import ai_summary, render_dashboard
     if args.skip_ai:
-        dq = bq.rows((run_dir / "dq_results.csv").read_text())
-        commentary = {"ok": False, "status": ai_summary.status_of(dq), "reason": "AI 요약을 건너뛰었어요 (--skip-ai)."}
+        commentary = {"ok": False, "reason": "AI 요약을 건너뛰었어요 (--skip-ai)."}
     else:
         commentary = ai_summary.summarize(run_dir)
     (run_dir / "commentary.json").write_text(json.dumps(commentary, ensure_ascii=False, indent=2))

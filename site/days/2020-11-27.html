@@ -132,7 +132,6 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
   </div>
   <a class="pill screen-only" href="../reports.html" style="color:inherit;text-decoration:none">일별 리포트 목록</a>
   <a class="pill screen-only" href="../pdf/2020-11-27.pdf" style="color:inherit;text-decoration:none">PDF 저장본</a>
-  <span class="pill"><span class="dot good">✓</span>데이터 상태: 정상</span>
 </div>
 
 <main>
@@ -206,12 +205,10 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
   <div class="row2">
     <div class="visual ai">
       <h2>AI 일일 코멘트</h2>
-      <div class="banner"><span class="dot good">✓</span><span>데이터 품질 체크를 모두 통과했어요.</span></div>
       
         <p class="ai-headline">매출, 주문 수, 세션 전환율, 장바구니율이 최근 7일 기준 직전 7일 대비 올라 notable로 판정됐어요.</p>
         <h3>주목할 변화</h3><ul><li>매출은 최근 7일 기준 직전 7일 대비 +27.4% 올라 임계치를 넘었어요.</li><li>주문 수는 최근 7일 기준 직전 7일 대비 +27.8% 올라 임계치를 넘었어요.</li><li>세션 전환율은 최근 7일 기준 직전 7일 대비 +0.21%p 올라 임계치를 넘었어요.</li></ul>
         <h3>확인할 것</h3><ul><li>장바구니율: 최근 7일 기준 직전 7일 대비 +2.08%p 변해 임계치를 넘었어요(notable). 다음 리포트에서도 같은 기준으로 살펴봐요.</li><li>매출, 주문 수, 세션 전환율: 최근 7일 변화가 임계치를 넘었어요. 다음 리포트에서도 같은 기준으로 살펴봐요.</li></ul>
-        <h3>데이터 품질</h3><p class="note">모든 품질 체크가 PASS이고 해석 보류 대상 지표는 없어요. 주문 매출 vs 상품 매출 불일치 비중은 18.9%로 PASS예요.</p>
         <p class="meta">claude-opus-5-5가 작성했어요. 문장 속 숫자는 모두 SQL 집계 결과에서 채워 넣었어요.</p>
       
     </div>
@@ -273,8 +270,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
         <span class="funnel-meta num">454 세션 · 전체의 1.7% · 이전 단계 대비 37.0%</span></div>
     </div>
     
-    <p class="note num" style="margin-top:8px">참고: 상품 조회 세션 중 장바구니에 담은 비율 10.6%
-      </p>
+    <p class="note num" style="margin-top:8px">참고: 상품 조회 세션 중 장바구니에 담은 비율 10.6%</p>
   </div>
   <div class="visual">
     <h2>지표 상세 (지표 정의집 Tier 1·2)</h2>
@@ -390,7 +386,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
     <p class="note" style="margin-top:8px">DQ는 데이터 품질 체크, R은 같은 숫자를 다른 단위로 계산해 맞춰보는 대사 규칙이에요. 하나라도 실패하면 그날 리포트는 해석 보류로 표시돼요.</p>
   </div>
 </section>
-<footer>생성 2026-11-05 08:14 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
+<footer>생성 2026-11-05 12:01 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
 </main>
 
 <nav class="tabs">

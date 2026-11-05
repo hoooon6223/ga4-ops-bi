@@ -23,6 +23,8 @@ CAUSAL_WORDS = ["요인", "영향", "원인", "때문", "덕분", "인해", "기
 # One fact per sentence: endings that join two facts ("rose, so ...", "warning, therefore ...") are rejected too.
 LINKING = re.compile(r"해서|하여|라서|이라[\s,]|므로|니까|면서|고 있어|\S(으로|로)\s")
 SPELLED_NUMBER = re.compile(r"(^|\s)(영|제로)(\s|이|으|$)")
+# Data-quality results live on the dashboard's quality tab only, never in the comment.
+QUALITY = re.compile(r"품질|해석 보류|누락|WARN|FAIL|경고")
 RAW_LABEL = re.compile(r"\b(notable|normal)\b|\b(K|D|DQ)\d{2}_[a-z_]+")
 
 SCHEMA = {
@@ -43,9 +45,8 @@ SCHEMA = {
             },
         },
         "watch_items": {"type": "array", "items": {"type": "string"}},
-        "data_quality_note": {"type": "string"},
     },
-    "required": ["headline", "highlights", "watch_items", "data_quality_note"],
+    "required": ["headline", "highlights", "watch_items"],
     "additionalProperties": False,
 }
 
@@ -58,14 +59,9 @@ def _read(path):
         return list(csv.DictReader(f))
 
 
-def status_of(dq_rows):
-    statuses = {r["status"] for r in dq_rows}
-    return "hold" if "FAIL" in statuses else "caution" if "WARN" in statuses else "normal"
-
-
 def validate(c, table, metric_ids):
     errors = []
-    texts = [c["headline"], c["data_quality_note"], *c["watch_items"], *(h["text"] for h in c["highlights"])]
+    texts = [c["headline"], *c["watch_items"], *(h["text"] for h in c["highlights"])]
     for t in texts:
         for m in fmt.PLACEHOLDER.finditer(t):
             if (m.group(1), m.group(2)) not in table:
@@ -83,6 +79,8 @@ def validate(c, table, metric_ids):
             errors.append(f"숫자를 글자로 씀: {t}")
         if RAW_LABEL.search(plain):
             errors.append(f"영어 판정값이나 지표 ID를 그대로 씀: {t}")
+        if QUALITY.search(plain):
+            errors.append(f"데이터 품질 이야기를 씀 (품질 결과는 데이터 품질 탭에만 표시): {t}")
     for h in c["highlights"]:
         if h["metric_id"] not in metric_ids:
             errors.append(f"없는 지표: {h['metric_id']}")
@@ -126,28 +124,24 @@ def readable(commentary, run_dir):
     """The comment with numbers filled in from the day's CSVs (for the dashboard and the stored report)."""
     if not commentary.get("ok"):
         return None
-    table = fmt.placeholder_table(_read(run_dir / "kpi_comparison.csv"), _read(run_dir / "dq_results.csv"))
+    table = fmt.placeholder_table(_read(run_dir / "kpi_comparison.csv"), [])
     return {
         "headline": fmt.fill(commentary["headline"], table),
         "highlights": [fmt.fill(h["text"], table) for h in commentary["highlights"]],
         "watch_items": [fmt.fill(w, table) for w in commentary["watch_items"]],
-        "data_quality_note": fmt.fill(commentary["data_quality_note"], table),
     }
 
 
 def summarize(run_dir):
+    # The AI sees only the KPI comparison table; quality-check results are not sent.
     comparison = _read(run_dir / "kpi_comparison.csv")
-    dq = _read(run_dir / "dq_results.csv")
-    table = fmt.placeholder_table(comparison, dq)
+    table = fmt.placeholder_table(comparison, [])
     metric_ids = {r["metric_id"] for r in comparison}
-    status = status_of(dq)
     day = dt.date.fromisoformat(run_dir.name)
 
     user_text = (
         f"리포트 날짜: {day} ({'월화수목금토일'[day.weekday()]}요일)\n"
-        f"리포트 상태(status): {status}\n\n"
         f"[kpi_comparison.csv]\n{(run_dir / 'kpi_comparison.csv').read_text()}\n"
-        f"[dq_results.csv]\n{(run_dir / 'dq_results.csv').read_text()}\n"
         "사용 가능한 자리표시:\n" + "\n".join(f"{{{{{i}.{f}}}}}" for i, f in sorted(table))
     )
 
@@ -161,8 +155,8 @@ def summarize(run_dir):
             errors = validate(c, table, metric_ids)
     except (anthropic.APIError, RuntimeError) as e:
         print(f"AI summary failed: {e!r}")  # full detail stays in the run log, not on the page
-        return {"ok": False, "status": status, "reason": _friendly(e)}
+        return {"ok": False, "reason": _friendly(e)}
 
     if errors:
-        return {"ok": False, "status": status, "reason": "AI 요약이 숫자 검증을 통과하지 못했어요.", "errors": errors}
-    return {"ok": True, "status": status, "model": MODEL, **c}
+        return {"ok": False, "reason": "AI 요약이 숫자 검증을 통과하지 못했어요.", "errors": errors}
+    return {"ok": True, "model": MODEL, **c}

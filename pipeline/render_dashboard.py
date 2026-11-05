@@ -26,11 +26,6 @@ TILES = [  # metric_id, label, how to compute the 28-day sparkline from kpi_dail
     ("K06_aov", "객단가", lambda r: ratio(r["revenue"], r["orders_with_revenue"])),
 ]
 BASIS = {"day_wow": "지난주 같은 요일 대비", "r7_wow": "최근 7일 vs 직전 7일"}
-STATUS = {
-    "normal": ("good", "✓", "정상", "데이터 품질 체크를 모두 통과했어요."),
-    "caution": ("warning", "!", "주의", "일부 품질 체크에 경고가 있어요. 관련 지표는 해석에 주의하세요."),
-    "hold": ("critical", "✕", "해석 보류", "품질 체크가 실패했어요. 오늘 숫자는 해석을 보류하세요."),
-}
 DQ_BADGE = {"PASS": ("good", "✓", "통과"), "WARN": ("warning", "!", "경고"),
             "FAIL": ("critical", "✕", "실패"), "SKIP": ("muted", "–", "건너뜀")}
 
@@ -124,8 +119,6 @@ def render(run_dir):
     funnel = [{"label": n, "value": f"{v:,.0f}", "pct": v / steps[0][1] * 100 if steps[0][1] else 0,
                "step": "" if i == 0 or not steps[i - 1][1] else f"이전 단계 대비 {v / steps[i - 1][1] * 100:.1f}%"}
               for i, (n, v) in enumerate(steps)]
-    funnel_warn = any(r["check_id"] == "DQ08_funnel_tracking" and r["status"] == "WARN" for r in dq)
-    funnel_hold = {"D02_add_to_cart_rate"} if funnel_warn else set()  # DQ08: cart tracking gap
 
     decomposition = [
         {"label": "세션 (7일 합)", "value": table.get(("K03_sessions", "r7_value"), "–"), "change": table.get(("K03_sessions", "r7_change"), "–")},
@@ -137,7 +130,7 @@ def render(run_dir):
     detail = [{"name": r["metric_name"], "tier": r["tier"], "day": fmt.value(r["metric_id"], r["unit"], r["value_day"]),
                "dod": fmt.change(r["unit"], r["dod_change"]), "wow": fmt.change(r["unit"], r["wow_day_change"]),
                "r7": fmt.change(r["unit"], r["r7_change"]), "mom": fmt.change(r["unit"], r["mom_change"]),
-               "flag": "hold" if r["metric_id"] in funnel_hold else r["flag"]} for r in comparison.values()]
+               "flag": r["flag"]} for r in comparison.values()]
 
     dates = [t["kpi_date"] for t in trend]
     money = lambda v: f"${v:,.0f}"
@@ -158,7 +151,7 @@ def render(run_dir):
     env = Environment(loader=FileSystemLoader(ROOT / "templates"), autoescape=select_autoescape(["html", "j2"]))
     html = env.get_template("dashboard.html.j2").render(
         day=day, weekday="월화수목금토일"[d.weekday()], days=days,
-        status=STATUS[commentary["status"]], tiles=tiles, funnel=funnel, funnel_warn=funnel_warn,
+        tiles=tiles, funnel=funnel,
         cart_rate=f"{cart_rate:.1f}%",
         decomposition=decomposition, detail=detail, charts=charts, ai=ai,
         dq=[{**r, "badge": DQ_BADGE[r["status"]]} for r in dq],
@@ -176,7 +169,7 @@ def render(run_dir):
 
 
 def render_report_list(env):
-    """site/reports.html: one row per day with status and the AI headline."""
+    """site/reports.html: one row per day with the AI headline and links."""
     rows = []
     for run_dir in sorted(RUNS.iterdir(), reverse=True):
         c_path = run_dir / "commentary.json"
@@ -185,7 +178,7 @@ def render_report_list(env):
         c = json.loads(c_path.read_text())
         text = ai_summary.readable(c, run_dir)
         d = dt.date.fromisoformat(run_dir.name)
-        rows.append({"day": run_dir.name, "weekday": "월화수목금토일"[d.weekday()], "status": STATUS[c["status"]],
+        rows.append({"day": run_dir.name, "weekday": "월화수목금토일"[d.weekday()],
                      "headline": text["headline"] if text else c.get("reason", ""), "ai_ok": bool(text)})
     html = env.get_template("reports.html.j2").render(
         rows=rows, generated=dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"))

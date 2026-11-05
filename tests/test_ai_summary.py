@@ -16,7 +16,7 @@ IDS = {"K01_revenue", "K05_session_cvr"}
 
 def comment(text, metric_id="K01_revenue"):
     return {"headline": text, "highlights": [{"metric_id": metric_id, "direction": "down", "text": "매출 하락"}],
-            "watch_items": [], "data_quality_note": "정상이에요."}
+            "watch_items": []}
 
 
 class ValidateTest(unittest.TestCase):
@@ -45,9 +45,8 @@ class ValidateTest(unittest.TestCase):
 
     def test_template_sentences_pass(self):
         for s in ["주목: 매출, 주문 수 (최근 7일 vs 직전 7일).",
-                  "매출: 최근 7일 vs 직전 7일 {{K01_revenue.r7_change}} (주목, 해석 보류).",
-                  "매출 누락률 WARN ({{DQ03_null_revenue.value}}). 해석 보류: 매출, 객단가.",
-                  "주목 지표 없음.", "모든 품질 체크 통과."]:
+                  "매출: 최근 7일 vs 직전 7일 {{K01_revenue.r7_change}} (주목).",
+                  "주목 지표 없음."]:
             self.assertEqual(ai_summary.validate(comment(s), TABLE, IDS), [], s)
 
     def test_unknown_metric_fails(self):
@@ -65,9 +64,10 @@ class ValidateTest(unittest.TestCase):
         filled = fmt.fill("{{K01_revenue.r7_change}} / {{K05_session_cvr.r7_change}} / {{K01_revenue.value_day}}", TABLE)
         self.assertEqual(filled, "-32.0% / +0.15%p / $1,714")
 
-    def test_status(self):
-        self.assertEqual(ai_summary.status_of(DQ), "caution")
-        self.assertEqual(ai_summary.status_of(DQ + [{"status": "FAIL"}]), "hold")
+    def test_quality_talk_fails(self):
+        # Quality results belong on the quality tab, not in the comment.
+        self.assertTrue(ai_summary.validate(comment("매출 누락률 WARN이에요."), TABLE, IDS))
+        self.assertTrue(ai_summary.validate(comment("매출: 최근 7일 vs 직전 7일 {{K01_revenue.r7_change}} (주목, 해석 보류)."), TABLE, IDS))
 
 
 if __name__ == "__main__":
