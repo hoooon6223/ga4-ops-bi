@@ -23,10 +23,14 @@ GitHub 서버가 BigQuery에 접속할 때 쓰는 "로봇 계정"이에요.
 ## 2. Claude API 키 → `ANTHROPIC_API_KEY`
 
 1. [Claude Console](https://platform.claude.com/) → 로그인 → 결제 수단 등록 (사용한 만큼 과금)
-2. **API Keys → Create Key**
-3. GitHub Secrets에 등록
-   - Name: `ANTHROPIC_API_KEY`
-   - Secret: 발급된 키
+2. **Settings → API keys → Create Key**. 지금 발급되는 키는 `sk-ant-usr-`로 시작하고, `Authorization: Bearer` 헤더로 보내야 해요 (예전 `x-api-key` 헤더로 보내면 401).
+3. 아래 명령으로 키를 검사하고, 정상(`check: 200`)일 때만 GitHub Secrets `ANTHROPIC_API_KEY`에 등록해요. 워크플로는 이 값을 `ANTHROPIC_AUTH_TOKEN`으로 넘겨서 SDK가 Bearer 방식으로 보내게 해요.
+
+```bash
+printf 'Claude API key: '; read -rs K; echo; code=$(curl -s -o /dev/null -w "%{http_code}" https://api.anthropic.com/v1/models -H "Authorization: Bearer $K" -H "anthropic-version: 2023-06-01"); echo "check: $code"; [ "$code" = 200 ] && printf %s "$K" | gh secret set ANTHROPIC_API_KEY -R hoooon6223/ga4-ops-bi; unset K
+```
+
+> 공식 문서는 자동 실행(CI)에는 개인 키보다 **서비스 계정 키**를 권장해요. 개인 키는 내 계정으로 동작하기 때문이에요. 이 프로젝트는 개인 포트폴리오라 개인 키로 시작했어요.
 
 하루 1회 짧은 요약이라 비용은 적어요. Console에서 월 사용 한도를 걸어두면 안심이에요.
 

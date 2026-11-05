@@ -45,7 +45,8 @@ jobs:
 
       - name: Aggregate -> CSV -> Claude summary -> dashboard
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Console keys (sk-ant-usr-...) are sent as "Authorization: Bearer"; the SDK does that for ANTHROPIC_AUTH_TOKEN.
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_API_KEY }}
           RUN_DATE: ${{ inputs.date }}
         run: python -m pipeline.run_daily ${RUN_DATE:+--date "$RUN_DATE"}
 

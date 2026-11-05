@@ -46,7 +46,7 @@ docs/             EDA, 지표 정의집, 설정 가이드
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 gcloud auth login                      # bq CLI 인증
-export ANTHROPIC_API_KEY=...           # 없으면 --skip-ai
+export ANTHROPIC_AUTH_TOKEN=...        # Console API 키 (Bearer 방식). 없으면 --skip-ai
 .venv/bin/python -m pipeline.run_daily              # 다음 날짜
 .venv/bin/python -m pipeline.run_daily --date 2020-12-14
 .venv/bin/python -m unittest discover -s tests -t .
