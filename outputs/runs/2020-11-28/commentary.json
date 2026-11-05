@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "status": "caution",
+  "model": "claude-opus-5-5",
+  "headline": "최근 7일 매출과 주문이 크게 늘었고, 세션보다는 세션 전환율 상승이 주된 요인이에요. 다만 매출 누락 경고가 있어 매출 해석에는 주의가 필요해요.",
+  "highlights": [
+    {
+      "metric_id": "K01_revenue",
+      "direction": "up",
+      "text": "매출이 최근 7일 기준 직전 7일보다 {{K01_revenue.r7_change}} 늘었어요. 다만 매출 누락률 경고가 있어 실제 매출은 이보다 클 수 있어요."
+    },
+    {
+      "metric_id": "K02_orders",
+      "direction": "up",
+      "text": "주문 수가 최근 7일 기준 {{K02_orders.r7_change}} 늘었어요. 같은 기간 세션 변화는 {{K03_sessions.r7_change}}로 정상 범위라, 주문 증가는 유입보다 전환 쪽에서 나왔어요."
+    },
+    {
+      "metric_id": "K05_session_cvr",
+      "direction": "up",
+      "text": "세션 전환율이 최근 7일 기준 {{K05_session_cvr.r7_change}} 올라 {{K05_session_cvr.r7_value}}가 됐어요. 체크아웃 진입률({{D03_checkout_rate.r7_change}})과 결제 완료율({{D04_purchase_completion_rate.r7_change}})이 함께 오른 영향이에요."
+    }
+  ],
+  "watch_items": [
+    "장바구니율이 최근 7일 기준 {{D02_add_to_cart_rate.r7_change}} 올랐어요. 다만 지난주 같은 요일 값이 비어 있어 실제 행동 변화보다는 수집 방식이 바뀌었을 가능성이 있으니 추이를 더 지켜봐야 해요.",
+    "매출 누락률({{DQ03_null_revenue.value}})이 경고 수준이라, 이 비율이 더 오르는지 확인이 필요해요.",
+    "상품 조회율은 최근 7일 기준 {{D01_view_item_rate.r7_change}} 변해 정상 범위지만 소폭 하락 중이에요."
+  ],
+  "data_quality_note": "매출 누락률이 {{DQ03_null_revenue.value}}로 WARN이라 매출과 객단가는 과소 집계됐을 수 있어요. 그 밖의 품질 체크는 모두 PASS예요."
+}
