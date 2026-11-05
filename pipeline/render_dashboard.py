@@ -117,12 +117,15 @@ def render(run_dir):
 
     last7 = trend[-7:]
     s = lambda k: sum(f(t[k]) or 0 for t in last7)
-    steps = [("세션", s("sessions")), ("상품 조회", s("view_item_sessions")), ("장바구니", s("add_to_cart_sessions")),
+    # Cart is not a funnel step: many checkouts skip it ("buy now"). It is shown as a side metric.
+    steps = [("세션", s("sessions")), ("상품 조회", s("view_item_sessions")),
              ("체크아웃", s("checkout_sessions")), ("구매", s("order_sessions"))]
+    cart_rate = s("add_to_cart_sessions") / s("view_item_sessions") * 100 if s("view_item_sessions") else 0
     funnel = [{"label": n, "value": f"{v:,.0f}", "pct": v / steps[0][1] * 100 if steps[0][1] else 0,
                "step": "" if i == 0 or not steps[i - 1][1] else f"이전 단계 대비 {v / steps[i - 1][1] * 100:.1f}%"}
               for i, (n, v) in enumerate(steps)]
     funnel_warn = any(r["check_id"] == "DQ08_funnel_tracking" and r["status"] == "WARN" for r in dq)
+    funnel_hold = {"D02_add_to_cart_rate"} if funnel_warn else set()  # DQ08: cart tracking gap
 
     decomposition = [
         {"label": "세션 (7일 합)", "value": table.get(("K03_sessions", "r7_value"), "–"), "change": table.get(("K03_sessions", "r7_change"), "–")},
@@ -131,7 +134,6 @@ def render(run_dir):
         {"label": "매출 (7일 합)", "value": table.get(("K01_revenue", "r7_value"), "–"), "change": table.get(("K01_revenue", "r7_change"), "–")},
     ]
 
-    funnel_hold = {"D02_add_to_cart_rate", "D03_checkout_rate"} if funnel_warn else set()  # DQ08: not interpretable
     detail = [{"name": r["metric_name"], "tier": r["tier"], "day": fmt.value(r["metric_id"], r["unit"], r["value_day"]),
                "dod": fmt.change(r["unit"], r["dod_change"]), "wow": fmt.change(r["unit"], r["wow_day_change"]),
                "r7": fmt.change(r["unit"], r["r7_change"]), "mom": fmt.change(r["unit"], r["mom_change"]),
@@ -159,6 +161,7 @@ def render(run_dir):
     html = env.get_template("dashboard.html.j2").render(
         day=day, weekday="월화수목금토일"[d.weekday()], days=days,
         status=STATUS[commentary["status"]], tiles=tiles, funnel=funnel, funnel_warn=funnel_warn,
+        cart_rate=f"{cart_rate:.1f}%",
         decomposition=decomposition, detail=detail, charts=charts, ai=ai,
         dq=[{**r, "badge": DQ_BADGE[r["status"]]} for r in dq],
         generated=dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),

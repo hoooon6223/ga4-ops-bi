@@ -42,7 +42,7 @@ header.topbar { background: var(--bar); color: var(--bar-ink); padding: 10px 16p
   border-radius: 4px; padding: 6px 10px; }
 .slicer label { display: block; font-size: 11px; color: var(--ink-2); }
 .slicer select { font: inherit; color: var(--ink); background: transparent; border: 0; padding: 2px 0; min-width: 140px; }
-.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; white-space: nowrap;
   padding: 4px 10px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); }
 .dot { width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center;
   font-size: 11px; font-weight: 700; color: #fff; }
@@ -113,7 +113,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
   <div class="slicer">
     <label for="day">날짜</label>
     <select id="day">
-      <option value="2020-11-22" selected>2020-11-22</option>
+      <option value="2020-11-23" >2020-11-23</option><option value="2020-11-22" selected>2020-11-22</option><option value="2020-11-21" >2020-11-21</option><option value="2020-11-20" >2020-11-20</option><option value="2020-11-19" >2020-11-19</option><option value="2020-11-18" >2020-11-18</option><option value="2020-11-17" >2020-11-17</option><option value="2020-11-16" >2020-11-16</option><option value="2020-11-15" >2020-11-15</option><option value="2020-11-14" >2020-11-14</option><option value="2020-11-13" >2020-11-13</option><option value="2020-11-12" >2020-11-12</option><option value="2020-11-11" >2020-11-11</option><option value="2020-11-10" >2020-11-10</option><option value="2020-11-09" >2020-11-09</option><option value="2020-11-08" >2020-11-08</option><option value="2020-11-07" >2020-11-07</option><option value="2020-11-06" >2020-11-06</option><option value="2020-11-05" >2020-11-05</option><option value="2020-11-04" >2020-11-04</option><option value="2020-11-03" >2020-11-03</option><option value="2020-11-02" >2020-11-02</option><option value="2020-11-01" >2020-11-01</option>
     </select>
   </div>
   <span class="pill"><span class="dot warning">!</span>데이터 상태: 주의</span>
@@ -226,7 +226,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
 <section class="page" id="funnel">
   <div class="visual">
     <h2>구매 퍼널 (최근 7일 세션)</h2>
-    <div class="banner"><span class="dot warning">!</span><span>장바구니 이벤트 수집 누락이 의심돼요 (DQ08). 장바구니·체크아웃 단계 비율은 해석하지 마세요.</span></div>
+    <p class="note" style="margin-bottom:8px">상품 조회 → 체크아웃 → 구매. 장바구니는 건너뛰는 구매(바로 구매)가 많아 퍼널 단계에서 뺐어요.</p>
     
     <div class="funnel-row">
       <span>세션</span>
@@ -241,15 +241,9 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
     </div>
     
     <div class="funnel-row">
-      <span>장바구니</span>
-      <div><div class="funnel-bar" style="width: 2.0%" title="장바구니 531"></div>
-        <span class="funnel-meta num">531 세션 · 전체의 2.0% · 이전 단계 대비 8.0%</span></div>
-    </div>
-    
-    <div class="funnel-row">
       <span>체크아웃</span>
       <div><div class="funnel-bar" style="width: 4.0%" title="체크아웃 1,049"></div>
-        <span class="funnel-meta num">1,049 세션 · 전체의 4.0% · 이전 단계 대비 197.6%</span></div>
+        <span class="funnel-meta num">1,049 세션 · 전체의 4.0% · 이전 단계 대비 15.8%</span></div>
     </div>
     
     <div class="funnel-row">
@@ -258,6 +252,8 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
         <span class="funnel-meta num">376 세션 · 전체의 1.4% · 이전 단계 대비 35.8%</span></div>
     </div>
     
+    <p class="note num" style="margin-top:8px">참고: 상품 조회 세션 중 장바구니에 담은 비율 8.0%
+      <span class="pill" style="margin-left:6px"><span class="dot warning">!</span>장바구니 수집 누락 의심 (DQ08), 해석 보류</span></p>
   </div>
   <div class="visual">
     <h2>지표 상세 (지표 정의집 Tier 1·2)</h2>
@@ -294,11 +290,11 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
       
         <tr><td>장바구니율</td><td class="r">0.00%</td><td class="r">+0.00%p</td><td class="r">+0.00%p</td>
         <td class="r">+8.00%p</td><td class="r">–</td>
-        <td><span class="flag">주목</span></td></tr>
+        <td>보류</td></tr>
       
-        <tr><td>체크아웃 진입률</td><td class="r">–</td><td class="r">–</td><td class="r">–</td>
-        <td class="r">–</td><td class="r">–</td>
-        <td>–</td></tr>
+        <tr><td>체크아웃 진입률</td><td class="r">16.32%</td><td class="r">+0.91%p</td><td class="r">-5.66%p</td>
+        <td class="r">-2.90%p</td><td class="r">–</td>
+        <td>정상</td></tr>
       
         <tr><td>결제 완료율</td><td class="r">26.61%</td><td class="r">-1.17%p</td><td class="r">+7.34%p</td>
         <td class="r">+3.37%p</td><td class="r">–</td>
@@ -309,7 +305,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
         <td>정상</td></tr>
       </tbody>
     </table></div>
-    <p class="note" style="margin-top:8px">비율 지표는 %p 차이, 나머지는 증감률이에요. 판정은 지표 정의집의 비교 기준과 임계치를 따라요.</p>
+    <p class="note" style="margin-top:8px">비율 지표는 %p 차이, 나머지는 증감률이에요. 활성 사용자의 7일·전월 비교는 고유 사용자가 아니라 일별 사용자 수의 합으로 계산해요. 판정은 지표 정의집의 비교 기준과 임계치를 따라요.</p>
   </div>
 </section>
 
@@ -349,7 +345,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
         <td class="funnel-meta">FAIL if |orders wow| &lt;= 0.20 and revenue wow &lt;= -0.50</td><td class="funnel-meta">orders_r7_wow=0.123, revenue_r7_wow=0.134</td></tr>
       
         <tr><td><span class="pill"><span class="dot warning">!</span>경고</span></td>
-        <td>퍼널 순서 정합성 (장바구니 &gt;= 체크아웃)<br><span class="funnel-meta">DQ08_funnel_tracking</span></td>
+        <td>장바구니 수집 정합성 (장바구니 &gt;= 체크아웃)<br><span class="funnel-meta">DQ08_funnel_tracking</span></td>
         <td class="funnel-meta">&gt;= 1.0</td><td class="funnel-meta">add_to_cart_sessions=0, checkout_sessions=109</td></tr>
       
         <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
@@ -372,7 +368,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
     <p class="note" style="margin-top:8px">DQ는 데이터 품질 체크, R은 같은 숫자를 다른 단위로 계산해 맞춰보는 대사 규칙이에요. 하나라도 실패하면 그날 리포트는 해석 보류로 표시돼요.</p>
   </div>
 </section>
-<footer>생성 2026-11-05 06:41 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
+<footer>생성 2026-11-05 07:21 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
 </main>
 
 <nav class="tabs">

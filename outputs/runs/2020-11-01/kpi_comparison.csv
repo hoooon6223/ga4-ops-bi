@@ -1,0 +1,12 @@
+kpi_date,tier,metric_id,metric_name,unit,flag_basis,threshold,value_day,prev_day,dod_change,same_dow_last_week,wow_day_change,r7_value,r7_prev,r7_change,mtd_value,mtd_prev_month,mom_change,flag_change,flag
+2020-11-01,1,K01_revenue,매출,count,r7_wow,0.25,773.0,,,,,,,,773.0,,,,n/a
+2020-11-01,1,K02_orders,주문 수,count,r7_wow,0.25,14.0,,,,,,,,14.0,,,,n/a
+2020-11-01,1,K03_sessions,세션,count,day_wow,0.2,2625.0,,,,,,,,2625.0,,,,n/a
+2020-11-01,1,K04_active_users,활성 사용자,count,day_wow,0.2,2365.0,,,,,,,,2365.0,,,,n/a
+2020-11-01,1,K05_session_cvr,세션 전환율,rate,r7_wow,0.2,0.004952380952380952,,,,,,,,0.004952380952380952,,,,n/a
+2020-11-01,1,K06_aov,객단가,count,r7_wow,0.15,55.214285714285715,,,,,,,,55.214285714285715,,,,n/a
+2020-11-01,2,D01_view_item_rate,상품 조회율,rate,r7_wow,2.0,0.20457142857142857,,,,,,,,0.20457142857142857,,,,n/a
+2020-11-01,2,D02_add_to_cart_rate,장바구니율,rate,r7_wow,2.0,0.00186219739292365,,,,,,,,0.00186219739292365,,,,n/a
+2020-11-01,2,D03_checkout_rate,체크아웃 진입률,rate,r7_wow,5.0,0.17690875232774675,,,,,,,,0.17690875232774675,,,,n/a
+2020-11-01,2,D04_purchase_completion_rate,결제 완료율,rate,r7_wow,5.0,0.1368421052631579,,,,,,,,0.1368421052631579,,,,n/a
+2020-11-01,2,D05_new_user_share,신규 사용자 비중,rate,r7_wow,5.0,0.8228329809725159,,,,,,,,0.8228329809725159,,,,n/a

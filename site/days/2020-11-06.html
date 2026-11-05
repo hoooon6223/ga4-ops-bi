@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GA4 운영 리포트 2020-11-06</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f3f2f1; --card: #ffffff; --bar: #252423; --bar-ink: #ffffff;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+  --series: #2a78d6; --series-soft: #86b6ef; --up: #006300; --down: #d03b3b;
+  --good: #0ca30c; --warning: #fab219; --critical: #d03b3b;
+  --shadow: 0 1px 2px rgba(0,0,0,.08), 0 0 1px rgba(0,0,0,.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --card: #1a1a19; --bar: #000000;
+    --ink: #f0efec; --ink-2: #c3c2b7; --grid: #2c2c2a; --axis: #383835;
+    --border: rgba(255,255,255,0.10); --series: #3987e5; --series-soft: #184f95;
+    --up: #0ca30c; --down: #e66767; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --card: #1a1a19; --bar: #000000;
+  --ink: #f0efec; --ink-2: #c3c2b7; --grid: #2c2c2a; --axis: #383835;
+  --border: rgba(255,255,255,0.10); --series: #3987e5; --series-soft: #184f95;
+  --up: #0ca30c; --down: #e66767; --shadow: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 14px/1.5 "Segoe UI", system-ui, -apple-system, sans-serif; }
+header.topbar { background: var(--bar); color: var(--bar-ink); padding: 10px 16px;
+  display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.topbar h1 { font-size: 15px; font-weight: 600; margin: 0; }
+.topbar .sub { color: #c3c2b7; font-size: 12px; }
+.slicers { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; padding: 12px 16px 0; }
+.slicer { background: var(--card); box-shadow: var(--shadow); border: 1px solid var(--border);
+  border-radius: 4px; padding: 6px 10px; }
+.slicer label { display: block; font-size: 11px; color: var(--ink-2); }
+.slicer select { font: inherit; color: var(--ink); background: transparent; border: 0; padding: 2px 0; min-width: 140px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; white-space: nowrap;
+  padding: 4px 10px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); }
+.dot { width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center;
+  font-size: 11px; font-weight: 700; color: #fff; }
+.dot.good { background: var(--good); } .dot.warning { background: var(--warning); color: #0b0b0b; }
+.dot.critical { background: var(--critical); } .dot.muted { background: var(--muted); }
+main { padding: 12px 16px 72px; max-width: 1400px; }
+.page { display: none; } .page.active { display: grid; gap: 12px; }
+.visual { background: var(--card); box-shadow: var(--shadow); border: 1px solid var(--border);
+  border-radius: 4px; padding: 12px 14px; min-width: 0; }
+.visual h2 { font-size: 13px; font-weight: 600; margin: 0 0 8px; color: var(--ink); }
+.visual .note { font-size: 12px; color: var(--ink-2); margin: 0; }
+.tiles { display: grid; gap: 12px; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.tile .label { font-size: 12px; color: var(--ink-2); display: flex; justify-content: space-between; gap: 6px; }
+.tile .value { font-size: 26px; font-weight: 600; margin: 2px 0; }
+.tile .delta { font-size: 13px; font-weight: 600; }
+.delta.up { color: var(--up); } .delta.down { color: var(--down); } .delta.flat { color: var(--ink-2); }
+.tile .basis, .tile .more { font-size: 11px; color: var(--muted); }
+.flag { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px;
+  background: var(--warning); color: #0b0b0b; white-space: nowrap; }
+.spark { display: block; margin-top: 6px; width: 100%; height: 32px; }
+.spark-line { stroke: var(--series-soft); stroke-width: 2; }
+.spark-dot { fill: var(--series); }
+.row2 { display: grid; gap: 12px; grid-template-columns: 2fr 1fr; }
+.row3 { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+.banner { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 4px;
+  background: var(--page); margin-bottom: 10px; font-size: 13px; }
+.ai-headline { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
+.ai ul { margin: 0 0 8px; padding-left: 18px; } .ai li { margin: 2px 0; }
+.ai h3 { font-size: 12px; color: var(--ink-2); margin: 8px 0 2px; font-weight: 600; }
+.ai .meta { font-size: 11px; color: var(--muted); margin-top: 8px; }
+.decomp { display: grid; gap: 6px; }
+.decomp div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--grid); padding: 4px 0; }
+.decomp .op { color: var(--muted); text-align: center; border: 0; display: block; padding: 0; }
+.num { font-variant-numeric: tabular-nums; }
+.chart { width: 100%; height: auto; display: block; }
+.chart .grid { stroke: var(--grid); stroke-width: 1; } .chart .axis { stroke: var(--axis); stroke-width: 1; }
+.chart .tick { fill: var(--muted); font-size: 10px; }
+.chart .series { stroke: var(--series); stroke-width: 2; stroke-linejoin: round; }
+.chart .xhair { stroke: var(--muted); stroke-width: 1; } .chart .xdot { fill: var(--series); stroke: var(--card); stroke-width: 2; }
+.tip { position: fixed; pointer-events: none; background: var(--card); color: var(--ink); border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,.18); border-radius: 4px; padding: 6px 8px; font-size: 12px; display: none; z-index: 10; }
+.tip strong { display: block; font-size: 14px; }
+.funnel-row { display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; margin: 6px 0; }
+.funnel-bar { height: 22px; background: var(--series); border-radius: 0 4px 4px 0; min-width: 2px; }
+.funnel-meta { font-size: 12px; color: var(--ink-2); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-weight: 600; color: var(--ink-2); font-size: 12px; border-bottom: 1px solid var(--axis); padding: 6px; }
+td { border-bottom: 1px solid var(--grid); padding: 6px; vertical-align: top; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+.table-wrap { overflow-x: auto; }
+nav.tabs { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border);
+  display: flex; gap: 2px; padding: 0 16px; overflow-x: auto; }
+nav.tabs a { padding: 10px 14px; color: var(--ink-2); text-decoration: none; font-size: 13px; white-space: nowrap;
+  border-top: 3px solid transparent; }
+nav.tabs a.active { color: var(--ink); font-weight: 600; border-top-color: var(--warning); }
+footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
+@media (max-width: 1100px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } .row2, .row3 { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tile .value { font-size: 20px; } }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <h1>GA4 Merch Shop · 운영 KPI 리포트</h1>
+  <span class="sub">기준일 2020-11-06 (금) · 공개 샘플 데이터를 하루씩 리플레이</span>
+</header>
+
+<div class="slicers">
+  <div class="slicer">
+    <label for="day">날짜</label>
+    <select id="day">
+      <option value="2020-11-23" >2020-11-23</option><option value="2020-11-22" >2020-11-22</option><option value="2020-11-21" >2020-11-21</option><option value="2020-11-20" >2020-11-20</option><option value="2020-11-19" >2020-11-19</option><option value="2020-11-18" >2020-11-18</option><option value="2020-11-17" >2020-11-17</option><option value="2020-11-16" >2020-11-16</option><option value="2020-11-15" >2020-11-15</option><option value="2020-11-14" >2020-11-14</option><option value="2020-11-13" >2020-11-13</option><option value="2020-11-12" >2020-11-12</option><option value="2020-11-11" >2020-11-11</option><option value="2020-11-10" >2020-11-10</option><option value="2020-11-09" >2020-11-09</option><option value="2020-11-08" >2020-11-08</option><option value="2020-11-07" >2020-11-07</option><option value="2020-11-06" selected>2020-11-06</option><option value="2020-11-05" >2020-11-05</option><option value="2020-11-04" >2020-11-04</option><option value="2020-11-03" >2020-11-03</option><option value="2020-11-02" >2020-11-02</option><option value="2020-11-01" >2020-11-01</option>
+    </select>
+  </div>
+  <span class="pill"><span class="dot warning">!</span>데이터 상태: 주의</span>
+</div>
+
+<main>
+<!-- Page 1: overview -->
+<section class="page" id="overview">
+  <div class="tiles">
+    
+    <div class="visual tile">
+      <div class="label"><span>매출</span></div>
+      <div class="value num">$3,038</div>
+      <div class="delta flat">
+         –</div>
+      <div class="basis">최근 7일 vs 직전 7일</div>
+      <div class="more">같은 요일 – · 전월 누적 –</div>
+      <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,29.0 24.0,3.0 48.0,12.3 72.0,21.4 96.0,22.2 120.0,14.0" fill="none" class="spark-line"/><circle cx="120.0" cy="14.0" r="3" class="spark-dot"/></svg>
+    </div>
+    
+    <div class="visual tile">
+      <div class="label"><span>주문 수</span></div>
+      <div class="value num">50</div>
+      <div class="delta flat">
+         –</div>
+      <div class="basis">최근 7일 vs 직전 7일</div>
+      <div class="more">같은 요일 – · 전월 누적 –</div>
+      <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,29.0 24.0,6.6 48.0,5.2 72.0,16.0 96.0,20.3 120.0,3.0" fill="none" class="spark-line"/><circle cx="120.0" cy="3.0" r="3" class="spark-dot"/></svg>
+    </div>
+    
+    <div class="visual tile">
+      <div class="label"><span>세션</span></div>
+      <div class="value num">3,332</div>
+      <div class="delta flat">
+         –</div>
+      <div class="basis">지난주 같은 요일 대비</div>
+      <div class="more">같은 요일 – · 전월 누적 –</div>
+      <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,29.0 24.0,18.5 48.0,3.0 72.0,12.6 96.0,17.4 120.0,22.3" fill="none" class="spark-line"/><circle cx="120.0" cy="22.3" r="3" class="spark-dot"/></svg>
+    </div>
+    
+    <div class="visual tile">
+      <div class="label"><span>활성 사용자</span></div>
+      <div class="value num">2,813</div>
+      <div class="delta flat">
+         –</div>
+      <div class="basis">지난주 같은 요일 대비</div>
+      <div class="more">같은 요일 – · 전월 누적 –</div>
+      <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,29.0 24.0,18.8 48.0,3.0 72.0,13.4 96.0,18.7 120.0,23.9" fill="none" class="spark-line"/><circle cx="120.0" cy="23.9" r="3" class="spark-dot"/></svg>
+    </div>
+    
+    <div class="visual tile">
+      <div class="label"><span>세션 전환율</span></div>
+      <div class="value num">1.44%</div>
+      <div class="delta flat">
+         –</div>
+      <div class="basis">최근 7일 vs 직전 7일</div>
+      <div class="more">같은 요일 – · 전월 누적 –</div>
+      <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,29.0 24.0,13.1 48.0,19.0 72.0,23.6 96.0,24.0 120.0,3.0" fill="none" class="spark-line"/><circle cx="120.0" cy="3.0" r="3" class="spark-dot"/></svg>
+    </div>
+    
+    <div class="visual tile">
+      <div class="label"><span>객단가</span></div>
+      <div class="value num">$60.76</div>
+      <div class="delta flat">
+         –</div>
+      <div class="basis">최근 7일 vs 직전 7일</div>
+      <div class="more">같은 요일 – · 전월 누적 –</div>
+      <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,29.0 24.0,3.0 48.0,21.1 72.0,26.4 96.0,21.7 120.0,26.1" fill="none" class="spark-line"/><circle cx="120.0" cy="26.1" r="3" class="spark-dot"/></svg>
+    </div>
+    
+  </div>
+
+  <div class="row2">
+    <div class="visual ai">
+      <h2>AI 일일 코멘트</h2>
+      <div class="banner"><span class="dot warning">!</span><span>일부 품질 체크에 경고가 있어요. 관련 지표는 해석에 주의하세요.</span></div>
+      
+        <p class="note">AI 요약을 건너뛰었어요 (--skip-ai). 아래 숫자는 SQL 집계 결과 그대로라 그대로 볼 수 있어요.</p>
+        
+      
+    </div>
+    <div class="visual">
+      <h2>매출 분해 (최근 7일, 직전 7일 대비)</h2>
+      <div class="decomp">
+        
+          
+          <div><span>세션 (7일 합)</span><span class="num">– <span class="funnel-meta">(–)</span></span></div>
+        
+          <span class="op">×</span>
+          <div><span>세션 전환율</span><span class="num">– <span class="funnel-meta">(–)</span></span></div>
+        
+          <span class="op">×</span>
+          <div><span>객단가</span><span class="num">– <span class="funnel-meta">(–)</span></span></div>
+        
+          <span class="op">≈</span>
+          <div><span>매출 (7일 합)</span><span class="num">– <span class="funnel-meta">(–)</span></span></div>
+        
+      </div>
+      <p class="note" style="margin-top:8px">한 세션에 주문이 여러 건인 경우가 있어 근사식이에요.</p>
+    </div>
+  </div>
+
+  <div class="row3">
+    <div class="visual"><h2>매출 · 최근 28일</h2><svg id="c-rev" class="chart" viewBox="0 0 560 200" role="img" aria-label="매출 최근 28일 추이" data-points='{"x": [52.0, 151.2, 250.4, 349.6, 448.8, 548.0], "dates": ["2020-11-01", "2020-11-02", "2020-11-03", "2020-11-04", "2020-11-05", "2020-11-06"], "labels": ["$773", "$4,694", "$3,293", "$1,921", "$1,792", "$3,038"], "y": [158.3, 78.9, 107.3, 135.1, 137.7, 112.5]}'><line x1="52" x2="548" y1="174.0" y2="174.0" class="axis"/><line x1="52" x2="548" y1="133.5" y2="133.5" class="grid"/><text x="46" y="137.5" class="tick" text-anchor="end">$2,000</text><line x1="52" x2="548" y1="93.0" y2="93.0" class="grid"/><text x="46" y="97.0" class="tick" text-anchor="end">$4,000</text><line x1="52" x2="548" y1="52.5" y2="52.5" class="grid"/><text x="46" y="56.5" class="tick" text-anchor="end">$6,000</text><line x1="52" x2="548" y1="12.0" y2="12.0" class="grid"/><text x="46" y="16.0" class="tick" text-anchor="end">$8,000</text><text x="548.0" y="194" class="tick" text-anchor="middle">11-06</text><polyline points="52.0,158.3 151.2,78.9 250.4,107.3 349.6,135.1 448.8,137.7 548.0,112.5" fill="none" class="series"/><line class="xhair" y1="12" y2="174" x1="-10" x2="-10"/><circle class="xdot" r="4" cx="-10" cy="-10"/><rect class="hit" x="52" y="0" width="496" height="200" fill="transparent"/></svg></div>
+    <div class="visual"><h2>세션 · 최근 28일</h2><svg id="c-ses" class="chart" viewBox="0 0 560 200" role="img" aria-label="세션 최근 28일 추이" data-points='{"x": [52.0, 151.2, 250.4, 349.6, 448.8, 548.0], "dates": ["2020-11-01", "2020-11-02", "2020-11-03", "2020-11-04", "2020-11-05", "2020-11-06"], "labels": ["2,625", "3,731", "5,356", "4,344", "3,846", "3,332"], "y": [120.8, 98.4, 65.5, 86.0, 96.1, 106.5]}'><line x1="52" x2="548" y1="174.0" y2="174.0" class="axis"/><line x1="52" x2="548" y1="133.5" y2="133.5" class="grid"/><text x="46" y="137.5" class="tick" text-anchor="end">2,000</text><line x1="52" x2="548" y1="93.0" y2="93.0" class="grid"/><text x="46" y="97.0" class="tick" text-anchor="end">4,000</text><line x1="52" x2="548" y1="52.5" y2="52.5" class="grid"/><text x="46" y="56.5" class="tick" text-anchor="end">6,000</text><line x1="52" x2="548" y1="12.0" y2="12.0" class="grid"/><text x="46" y="16.0" class="tick" text-anchor="end">8,000</text><text x="548.0" y="194" class="tick" text-anchor="middle">11-06</text><polyline points="52.0,120.8 151.2,98.4 250.4,65.5 349.6,86.0 448.8,96.1 548.0,106.5" fill="none" class="series"/><line class="xhair" y1="12" y2="174" x1="-10" x2="-10"/><circle class="xdot" r="4" cx="-10" cy="-10"/><rect class="hit" x="52" y="0" width="496" height="200" fill="transparent"/></svg></div>
+  </div>
+</section>
+
+<!-- Page 2: funnel + metric detail -->
+<section class="page" id="funnel">
+  <div class="visual">
+    <h2>구매 퍼널 (최근 7일 세션)</h2>
+    <p class="note" style="margin-bottom:8px">상품 조회 → 체크아웃 → 구매. 장바구니는 건너뛰는 구매(바로 구매)가 많아 퍼널 단계에서 뺐어요.</p>
+    
+    <div class="funnel-row">
+      <span>세션</span>
+      <div><div class="funnel-bar" style="width: 100.0%" title="세션 23,234"></div>
+        <span class="funnel-meta num">23,234 세션 · 전체의 100.0%</span></div>
+    </div>
+    
+    <div class="funnel-row">
+      <span>상품 조회</span>
+      <div><div class="funnel-bar" style="width: 21.5%" title="상품 조회 4,986"></div>
+        <span class="funnel-meta num">4,986 세션 · 전체의 21.5% · 이전 단계 대비 21.5%</span></div>
+    </div>
+    
+    <div class="funnel-row">
+      <span>체크아웃</span>
+      <div><div class="funnel-bar" style="width: 3.3%" title="체크아웃 768"></div>
+        <span class="funnel-meta num">768 세션 · 전체의 3.3% · 이전 단계 대비 15.4%</span></div>
+    </div>
+    
+    <div class="funnel-row">
+      <span>구매</span>
+      <div><div class="funnel-bar" style="width: 0.9%" title="구매 203"></div>
+        <span class="funnel-meta num">203 세션 · 전체의 0.9% · 이전 단계 대비 26.4%</span></div>
+    </div>
+    
+    <p class="note num" style="margin-top:8px">참고: 상품 조회 세션 중 장바구니에 담은 비율 0.0%
+      <span class="pill" style="margin-left:6px"><span class="dot warning">!</span>장바구니 수집 누락 의심 (DQ08), 해석 보류</span></p>
+  </div>
+  <div class="visual">
+    <h2>지표 상세 (지표 정의집 Tier 1·2)</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>지표</th><th class="r">당일</th><th class="r">전일 대비</th><th class="r">같은 요일 대비</th><th class="r">7일 vs 직전 7일</th><th class="r">전월 누적 대비</th><th>판정</th></tr></thead>
+      <tbody>
+        <tr><td>매출</td><td class="r">$3,038</td><td class="r">+69.5%</td><td class="r">–</td>
+        <td class="r">–</td><td class="r">–</td>
+        <td>–</td></tr>
+      
+        <tr><td>주문 수</td><td class="r">50</td><td class="r">+92.3%</td><td class="r">–</td>
+        <td class="r">–</td><td class="r">–</td>
+        <td>–</td></tr>
+      
+        <tr><td>세션</td><td class="r">3,332</td><td class="r">-13.4%</td><td class="r">–</td>
+        <td class="r">–</td><td class="r">–</td>
+        <td>–</td></tr>
+      
+        <tr><td>활성 사용자</td><td class="r">2,813</td><td class="r">-14.0%</td><td class="r">–</td>
+        <td class="r">–</td><td class="r">–</td>
+        <td>–</td></tr>
+      
+        <tr><td>세션 전환율</td><td class="r">1.44%</td><td class="r">+0.76%p</td><td class="r">–</td>
+        <td class="r">–</td><td class="r">–</td>
+        <td>–</td></tr>
+      
+        <tr><td>객단가</td><td class="r">$60.76</td><td class="r">-11.8%</td><td class="r">–</td>
+        <td class="r">–</td><td class="r">–</td>
+        <td>–</td></tr>
+      
+        <tr><td>상품 조회율</td><td class="r">25.75%</td><td class="r">+2.95%p</td><td class="r">–</td>
+        <td class="r">–</td><td class="r">–</td>
+        <td>–</td></tr>
+      
+        <tr><td>장바구니율</td><td class="r">0.00%</td><td class="r">+0.00%p</td><td class="r">–</td>
+        <td class="r">–</td><td class="r">–</td>
+        <td>보류</td></tr>
+      
+        <tr><td>체크아웃 진입률</td><td class="r">18.07%</td><td class="r">+3.70%p</td><td class="r">–</td>
+        <td class="r">–</td><td class="r">–</td>
+        <td>–</td></tr>
+      
+        <tr><td>결제 완료율</td><td class="r">30.97%</td><td class="r">+10.33%p</td><td class="r">–</td>
+        <td class="r">–</td><td class="r">–</td>
+        <td>–</td></tr>
+      
+        <tr><td>신규 사용자 비중</td><td class="r">72.02%</td><td class="r">-1.75%p</td><td class="r">–</td>
+        <td class="r">–</td><td class="r">–</td>
+        <td>–</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note" style="margin-top:8px">비율 지표는 %p 차이, 나머지는 증감률이에요. 활성 사용자의 7일·전월 비교는 고유 사용자가 아니라 일별 사용자 수의 합으로 계산해요. 판정은 지표 정의집의 비교 기준과 임계치를 따라요.</p>
+  </div>
+</section>
+
+<!-- Page 3: data quality -->
+<section class="page" id="quality">
+  <div class="visual">
+    <h2>데이터 품질 체크와 집계 대사</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>상태</th><th>체크</th><th>기준</th><th>세부</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
+        <td>데이터 도착<br><span class="funnel-meta">DQ01_arrival</span></td>
+        <td class="funnel-meta">&gt; 0</td><td class="funnel-meta">events=49004</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot muted">–</span>건너뜀</span></td>
+        <td>세션 급변 (같은 요일 대비)<br><span class="funnel-meta">DQ02_session_spike</span></td>
+        <td class="funnel-meta">|change| &lt;= 0.40</td><td class="funnel-meta">sessions=3332</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
+        <td>매출 누락률<br><span class="funnel-meta">DQ03_null_revenue</span></td>
+        <td class="funnel-meta">WARN &gt; 0.10, FAIL &gt; 0.30</td><td class="funnel-meta">null_revenue_orders=0 / orders=50</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
+        <td>주문 중복률<br><span class="funnel-meta">DQ04_dup_orders</span></td>
+        <td class="funnel-meta">&lt;= 0.15</td><td class="funnel-meta">purchase_events=58, orders=50</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot warning">!</span>경고</span></td>
+        <td>거래번호 누락률<br><span class="funnel-meta">DQ05_missing_tid</span></td>
+        <td class="funnel-meta">&lt;= 0.20</td><td class="funnel-meta">orders_without_tid=50</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot warning">!</span>경고</span></td>
+        <td>주문 매출 vs 상품 매출 불일치 비중<br><span class="funnel-meta">DQ06_item_reconcile</span></td>
+        <td class="funnel-meta">&lt;= 0.20</td><td class="funnel-meta">mismatch=11 / orders_with_revenue=50</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot muted">–</span>건너뜀</span></td>
+        <td>주문-매출 괴리 (rolling 7d)<br><span class="funnel-meta">DQ07_order_revenue_gap</span></td>
+        <td class="funnel-meta">FAIL if |orders wow| &lt;= 0.20 and revenue wow &lt;= -0.50</td><td class="funnel-meta">orders_r7_wow=null, revenue_r7_wow=null</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot warning">!</span>경고</span></td>
+        <td>장바구니 수집 정합성 (장바구니 &gt;= 체크아웃)<br><span class="funnel-meta">DQ08_funnel_tracking</span></td>
+        <td class="funnel-meta">&gt;= 1.0</td><td class="funnel-meta">add_to_cart_sessions=0, checkout_sessions=155</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
+        <td>주문 수 &lt;= purchase 이벤트 수<br><span class="funnel-meta">R1_events_to_orders</span></td>
+        <td class="funnel-meta">&lt;= 58</td><td class="funnel-meta">orders=50, purchase_events=58</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
+        <td>주문 = 세션 합산 (건수·매출)<br><span class="funnel-meta">R2_order_session_rollup</span></td>
+        <td class="funnel-meta">diff = 0</td><td class="funnel-meta">orders=50 vs 50, revenue=3038.00 vs 3038.00</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
+        <td>주문 세션 수 &lt;= 원본 purchase 세션 수<br><span class="funnel-meta">R3_order_sessions</span></td>
+        <td class="funnel-meta">&lt;= 48</td><td class="funnel-meta">order_sessions=48, raw_purchase_sessions=48</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
+        <td>중복 제거 매출 &lt;= 원본 매출<br><span class="funnel-meta">R5_dedup_revenue</span></td>
+        <td class="funnel-meta">&lt;= 3438.00</td><td class="funnel-meta">revenue=3038.00, raw_revenue=3438.00</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note" style="margin-top:8px">DQ는 데이터 품질 체크, R은 같은 숫자를 다른 단위로 계산해 맞춰보는 대사 규칙이에요. 하나라도 실패하면 그날 리포트는 해석 보류로 표시돼요.</p>
+  </div>
+</section>
+<footer>생성 2026-11-05 07:21 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
+</main>
+
+<nav class="tabs">
+  <a href="#overview">개요</a><a href="#funnel">퍼널 · 지표 상세</a><a href="#quality">데이터 품질</a>
+</nav>
+<div class="tip" id="tip"></div>
+
+<script>
+// Page tabs (hash-based, like Power BI report pages)
+function showPage() {
+  const id = (location.hash || "#overview").slice(1);
+  document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === id));
+  document.querySelectorAll("nav.tabs a").forEach(a => a.classList.toggle("active", a.hash === "#" + id));
+}
+addEventListener("hashchange", showPage); showPage();
+
+// Date slicer: each day is its own static page
+document.getElementById("day").addEventListener("change", e => { location.href = e.target.value + ".html" + location.hash; });
+
+// Line chart crosshair + tooltip
+const tip = document.getElementById("tip");
+document.querySelectorAll("svg.chart").forEach(svg => {
+  const d = JSON.parse(svg.dataset.points);
+  const hair = svg.querySelector(".xhair"), dot = svg.querySelector(".xdot");
+  svg.querySelector(".hit").addEventListener("pointermove", ev => {
+    const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    const x = pt.matrixTransform(svg.getScreenCTM().inverse()).x;
+    let i = 0; d.x.forEach((v, k) => { if (Math.abs(v - x) < Math.abs(d.x[i] - x)) i = k; });
+    hair.setAttribute("x1", d.x[i]); hair.setAttribute("x2", d.x[i]);
+    if (d.y[i] !== null) { dot.setAttribute("cx", d.x[i]); dot.setAttribute("cy", d.y[i]); }
+    tip.replaceChildren();
+    const s = document.createElement("strong"); s.textContent = d.labels[i];
+    tip.append(s, document.createTextNode(d.dates[i]));
+    tip.style.display = "block"; tip.style.left = (ev.clientX + 12) + "px"; tip.style.top = (ev.clientY - 40) + "px";
+  });
+  svg.querySelector(".hit").addEventListener("pointerleave", () => {
+    tip.style.display = "none"; hair.setAttribute("x1", -10); hair.setAttribute("x2", -10); dot.setAttribute("cx", -10);
+  });
+});
+</script>
+</body>
+</html>

@@ -75,7 +75,7 @@ checks AS (
     FORMAT('orders_r7_wow=%s, revenue_r7_wow=%s',
       IFNULL(FORMAT('%.3f', orders_r7_wow), 'null'), IFNULL(FORMAT('%.3f', revenue_r7_wow), 'null')) FROM v
   UNION ALL
-  SELECT 'DQ08_funnel_tracking', '퍼널 순서 정합성 (장바구니 >= 체크아웃)', SAFE_DIVIDE(add_to_cart_sessions, checkout_sessions), '>= 1.0',
+  SELECT 'DQ08_funnel_tracking', '장바구니 수집 정합성 (장바구니 >= 체크아웃)', SAFE_DIVIDE(add_to_cart_sessions, checkout_sessions), '>= 1.0',
     CASE WHEN checkout_sessions = 0 THEN 'SKIP' WHEN add_to_cart_sessions < checkout_sessions THEN 'WARN' ELSE 'PASS' END,
     FORMAT('add_to_cart_sessions=%d, checkout_sessions=%d', add_to_cart_sessions, checkout_sessions) FROM v
   UNION ALL

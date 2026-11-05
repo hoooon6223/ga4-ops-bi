@@ -92,7 +92,8 @@ m AS (
     ('K06_aov', SAFE_DIVIDE(revenue, orders_with_revenue)),
     ('D01_view_item_rate', SAFE_DIVIDE(view_item_sessions, sessions)),
     ('D02_add_to_cart_rate', SAFE_DIVIDE(add_to_cart_sessions, view_item_sessions)),
-    ('D03_checkout_rate', SAFE_DIVIDE(checkout_sessions, add_to_cart_sessions)),
+    -- Funnel is view -> checkout -> purchase. Cart is not a step ("buy now" skips it), so D02 is a side metric.
+    ('D03_checkout_rate', SAFE_DIVIDE(checkout_sessions, view_item_sessions)),
     ('D04_purchase_completion_rate', SAFE_DIVIDE(order_sessions, checkout_sessions)),
     ('D05_new_user_share', SAFE_DIVIDE(new_users, active_users))
   ]) AS x

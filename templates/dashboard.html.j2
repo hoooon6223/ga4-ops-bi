@@ -173,7 +173,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
 <section class="page" id="funnel">
   <div class="visual">
     <h2>구매 퍼널 (최근 7일 세션)</h2>
-    {% if funnel_warn %}<div class="banner"><span class="dot warning">!</span><span>장바구니 이벤트 수집 누락이 의심돼요 (DQ08). 장바구니·체크아웃 단계 비율은 해석하지 마세요.</span></div>{% endif %}
+    <p class="note" style="margin-bottom:8px">상품 조회 → 체크아웃 → 구매. 장바구니는 건너뛰는 구매(바로 구매)가 많아 퍼널 단계에서 뺐어요.</p>
     {% for s in funnel %}
     <div class="funnel-row">
       <span>{{ s.label }}</span>
@@ -181,6 +181,8 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
         <span class="funnel-meta num">{{ s.value }} 세션 · 전체의 {{ '%.1f' % s.pct }}%{% if s.step %} · {{ s.step }}{% endif %}</span></div>
     </div>
     {% endfor %}
+    <p class="note num" style="margin-top:8px">참고: 상품 조회 세션 중 장바구니에 담은 비율 {{ cart_rate }}
+      {% if funnel_warn %}<span class="pill" style="margin-left:6px"><span class="dot warning">!</span>장바구니 수집 누락 의심 (DQ08), 해석 보류</span>{% endif %}</p>
   </div>
   <div class="visual">
     <h2>지표 상세 (지표 정의집 Tier 1·2)</h2>
@@ -192,7 +194,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
         <td>{% if r.flag == 'hold' %}보류{% elif r.flag == 'notable' %}<span class="flag">주목</span>{% elif r.flag == 'normal' %}정상{% else %}–{% endif %}</td></tr>
       {% endfor %}</tbody>
     </table></div>
-    <p class="note" style="margin-top:8px">비율 지표는 %p 차이, 나머지는 증감률이에요. 판정은 지표 정의집의 비교 기준과 임계치를 따라요.</p>
+    <p class="note" style="margin-top:8px">비율 지표는 %p 차이, 나머지는 증감률이에요. 활성 사용자의 7일·전월 비교는 고유 사용자가 아니라 일별 사용자 수의 합으로 계산해요. 판정은 지표 정의집의 비교 기준과 임계치를 따라요.</p>
   </div>
 </section>
 
