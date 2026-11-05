@@ -20,6 +20,10 @@ MODEL = os.environ.get("CLAUDE_MODEL", "claude-opus-5-5")
 ALLOWED_DIGIT_PHRASES = re.compile(r"(최근\s*)?(7|28)일")
 # The comment reports what changed, not why. Cause, effect and guess words are rejected.
 CAUSAL_WORDS = ["요인", "영향", "원인", "때문", "덕분", "인해", "기인", "견인", "주도", "가능성", "추정", "수 있"]
+# One fact per sentence: endings that join two facts ("rose, so ...", "warning, therefore ...") are rejected too.
+LINKING = re.compile(r"해서|하여|라서|이라[\s,]|므로|니까|면서|고 있어|\S(으로|로)\s")
+SPELLED_NUMBER = re.compile(r"(^|\s)(영|제로)(\s|이|으|$)")
+RAW_LABEL = re.compile(r"\b(notable|normal)\b|\b(K|D|DQ)\d{2}_[a-z_]+")
 
 SCHEMA = {
     "type": "object",
@@ -72,6 +76,13 @@ def validate(c, table, metric_ids):
         found = [w for w in CAUSAL_WORDS if w in t]
         if found:
             errors.append(f"원인·추측 표현을 씀 ({', '.join(found)}): {t}")
+        plain = fmt.PLACEHOLDER.sub("", t)
+        if LINKING.search(plain):
+            errors.append(f"두 사실을 잇는 연결 어미를 씀 ('{LINKING.search(plain).group(0).strip()}'): {t}")
+        if SPELLED_NUMBER.search(plain):
+            errors.append(f"숫자를 글자로 씀: {t}")
+        if RAW_LABEL.search(plain):
+            errors.append(f"영어 판정값이나 지표 ID를 그대로 씀: {t}")
     for h in c["highlights"]:
         if h["metric_id"] not in metric_ids:
             errors.append(f"없는 지표: {h['metric_id']}")

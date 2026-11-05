@@ -36,6 +36,20 @@ class ValidateTest(unittest.TestCase):
         self.assertTrue(ai_summary.validate(comment("실제 매출은 이보다 클 수 있어요."), TABLE, IDS))
         self.assertEqual(ai_summary.validate(comment("세션 전환율이 {{K05_session_cvr.r7_change}} 변했어요."), TABLE, IDS), [])
 
+    def test_linked_facts_fail(self):
+        # Real sentences from earlier comments that tied two facts together.
+        self.assertTrue(ai_summary.validate(comment("매출이 상승해서 주목 판정이에요."), TABLE, IDS))
+        self.assertTrue(ai_summary.validate(comment("매출 누락률 경고로 매출은 해석 보류예요."), TABLE, IDS))
+        self.assertTrue(ai_summary.validate(comment("지난주 같은 요일 값이 영이라 비교 기준이 없어요."), TABLE, IDS))
+        self.assertTrue(ai_summary.validate(comment("K01_revenue is notable."), TABLE, IDS))
+
+    def test_template_sentences_pass(self):
+        for s in ["주목: 매출, 주문 수 (최근 7일 vs 직전 7일).",
+                  "매출: 최근 7일 vs 직전 7일 {{K01_revenue.r7_change}} (주목, 해석 보류).",
+                  "매출 누락률 WARN ({{DQ03_null_revenue.value}}). 해석 보류: 매출, 객단가.",
+                  "주목 지표 없음.", "모든 품질 체크 통과."]:
+            self.assertEqual(ai_summary.validate(comment(s), TABLE, IDS), [], s)
+
     def test_unknown_metric_fails(self):
         self.assertTrue(ai_summary.validate(comment("정상이에요.", metric_id="K99_fake"), TABLE, IDS))
 
