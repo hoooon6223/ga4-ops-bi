@@ -1,0 +1,119 @@
+dim,val,users,revenue
+country_top,United States,118493,160573.0
+country_top,India,25367,34986.0
+country_top,Canada,20268,32799.0
+country_top,United Kingdom,8527,11458.0
+country_top,France,5381,6650.0
+country_top,Spain,5044,7681.0
+country_top,Germany,4866,5288.0
+country_top,China,4620,6623.0
+country_top,Taiwan,4568,4238.0
+country_top,Italy,3750,4967.0
+country_top,Singapore,3597,3824.0
+country_top,Japan,3547,5752.0
+country_top,South Korea,3424,3543.0
+country_top,Netherlands,3042,3991.0
+country_top,Turkey,2733,5345.0
+country_top,Brazil,2696,4177.0
+country_top,Australia,2453,4378.0
+country_top,Indonesia,2408,2124.0
+country_top,Poland,2368,2989.0
+country_top,Mexico,2264,3211.0
+country_top,(not set),2168,1565.0
+country_top,Russia,1758,2378.0
+country_top,Hong Kong,1652,1995.0
+country_top,Ireland,1584,2483.0
+country_top,Sweden,1490,1256.0
+country_top,Malaysia,1430,3121.0
+country_top,Switzerland,1428,1038.0
+country_top,Philippines,1333,1643.0
+country_top,Colombia,1285,2130.0
+country_top,Israel,1262,1219.0
+country_top,Pakistan,1206,1417.0
+country_top,Peru,1195,1377.0
+country_top,Thailand,1191,2562.0
+country_top,Portugal,1165,1371.0
+country_top,Vietnam,1128,1604.0
+country_top,Belgium,1116,498.0
+country_top,Ukraine,990,1094.0
+country_top,Greece,975,1725.0
+country_top,United Arab Emirates,844,692.0
+country_top,Denmark,748,727.0
+country_top,Romania,723,436.0
+country_top,Argentina,710,550.0
+country_top,Czechia,700,707.0
+country_top,Austria,687,836.0
+country_top,Saudi Arabia,575,618.0
+country_top,Egypt,549,493.0
+country_top,Bangladesh,540,352.0
+country_top,Sri Lanka,475,400.0
+country_top,Finland,468,1092.0
+country_top,South Africa,467,77.0
+country_top,Chile,466,512.0
+country_top,Norway,416,61.0
+country_top,Nigeria,384,627.0
+country_top,Hungary,381,277.0
+country_top,New Zealand,371,299.0
+country_top,Morocco,370,517.0
+country_top,Slovakia,362,399.0
+country_top,Croatia,326,50.0
+country_top,Bulgaria,311,361.0
+country_top,Ecuador,245,252.0
+country_top,Lithuania,245,83.0
+country_top,Slovenia,224,543.0
+country_top,Serbia,216,161.0
+country_top,Puerto Rico,175,329.0
+country_top,Iraq,172,385.0
+country_top,Kenya,168,120.0
+country_top,Algeria,164,105.0
+country_top,Jordan,156,42.0
+country_top,Kazakhstan,156,221.0
+country_top,Kuwait,155,383.0
+country_top,Dominican Republic,154,428.0
+country_top,Tunisia,143,193.0
+country_top,Costa Rica,140,281.0
+country_top,Georgia,124,143.0
+country_top,Latvia,123,58.0
+country_top,Belarus,121,80.0
+country_top,Azerbaijan,120,0.0
+country_top,North Macedonia,113,293.0
+country_top,Nepal,113,0.0
+country_top,Palestine,112,164.0
+country_top,Lebanon,111,198.0
+country_top,Myanmar (Burma),107,0.0
+country_top,Cambodia,107,45.0
+country_top,Uruguay,104,249.0
+country_top,Estonia,103,0.0
+country_top,Qatar,101,30.0
+country_top,Cyprus,95,104.0
+country_top,Guatemala,93,152.0
+country_top,Venezuela,92,11.0
+country_top,Jamaica,89,0.0
+country_top,Iceland,83,0.0
+country_top,El Salvador,81,165.0
+country_top,Albania,71,31.0
+country_top,Bolivia,69,92.0
+country_top,Oman,66,0.0
+country_top,Mongolia,66,134.0
+country_top,Ghana,65,0.0
+country_top,Panama,62,44.0
+country_top,Bosnia & Herzegovina,60,49.0
+country_top,Armenia,60,85.0
+country_top,Malta,57,910.0
+country_top,Luxembourg,56,12.0
+country_top,Trinidad & Tobago,55,0.0
+country_top,Macao,55,140.0
+country_top,Bahamas,54,24.0
+country_top,Bahrain,53,206.0
+country_top,Kosovo,53,20.0
+country_top,Honduras,51,14.0
+country_top,Paraguay,51,30.0
+device,desktop,158917,208815.0
+device,mobile,109195,146768.0
+device,tablet,6250,6582.0
+medium,organic,112358,104007.0
+medium,(none),75951,79650.0
+medium,referral,55495,83521.0
+medium,<Other>,51038,35470.0
+medium,(data deleted),18204,50461.0
+medium,cpc,15528,9056.0

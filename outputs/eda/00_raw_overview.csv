@@ -1,0 +1,2 @@
+min_date,max_date,days,events,event_types,users,sessions,purchase_events,distinct_transaction_ids,purchase_revenue,platforms,platform_list
+20201101,20210131,92,4295584,17,270154,360129,5692,4452,362165.0,1,WEB

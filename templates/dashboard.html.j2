@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GA4 운영 리포트 {{ day }}</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f3f2f1; --card: #ffffff; --bar: #252423; --bar-ink: #ffffff;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+  --series: #2a78d6; --series-soft: #86b6ef; --up: #006300; --down: #d03b3b;
+  --good: #0ca30c; --warning: #fab219; --critical: #d03b3b;
+  --shadow: 0 1px 2px rgba(0,0,0,.08), 0 0 1px rgba(0,0,0,.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --card: #1a1a19; --bar: #000000;
+    --ink: #f0efec; --ink-2: #c3c2b7; --grid: #2c2c2a; --axis: #383835;
+    --border: rgba(255,255,255,0.10); --series: #3987e5; --series-soft: #184f95;
+    --up: #0ca30c; --down: #e66767; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --card: #1a1a19; --bar: #000000;
+  --ink: #f0efec; --ink-2: #c3c2b7; --grid: #2c2c2a; --axis: #383835;
+  --border: rgba(255,255,255,0.10); --series: #3987e5; --series-soft: #184f95;
+  --up: #0ca30c; --down: #e66767; --shadow: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 14px/1.5 "Segoe UI", system-ui, -apple-system, sans-serif; }
+header.topbar { background: var(--bar); color: var(--bar-ink); padding: 10px 16px;
+  display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.topbar h1 { font-size: 15px; font-weight: 600; margin: 0; }
+.topbar .sub { color: #c3c2b7; font-size: 12px; }
+.slicers { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; padding: 12px 16px 0; }
+.slicer { background: var(--card); box-shadow: var(--shadow); border: 1px solid var(--border);
+  border-radius: 4px; padding: 6px 10px; }
+.slicer label { display: block; font-size: 11px; color: var(--ink-2); }
+.slicer select { font: inherit; color: var(--ink); background: transparent; border: 0; padding: 2px 0; min-width: 140px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; white-space: nowrap;
+  padding: 4px 10px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); }
+.dot { width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center;
+  font-size: 11px; font-weight: 700; color: #fff; }
+.dot.good { background: var(--good); } .dot.warning { background: var(--warning); color: #0b0b0b; }
+.dot.critical { background: var(--critical); } .dot.muted { background: var(--muted); }
+main { padding: 12px 16px 72px; max-width: 1400px; }
+.page { display: none; } .page.active { display: grid; gap: 12px; }
+.visual { background: var(--card); box-shadow: var(--shadow); border: 1px solid var(--border);
+  border-radius: 4px; padding: 12px 14px; min-width: 0; }
+.visual h2 { font-size: 13px; font-weight: 600; margin: 0 0 8px; color: var(--ink); }
+.visual .note { font-size: 12px; color: var(--ink-2); margin: 0; }
+.tiles { display: grid; gap: 12px; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.tile .label { font-size: 12px; color: var(--ink-2); display: flex; justify-content: space-between; gap: 6px; }
+.tile .value { font-size: 26px; font-weight: 600; margin: 2px 0; }
+.tile .delta { font-size: 13px; font-weight: 600; }
+.delta.up { color: var(--up); } .delta.down { color: var(--down); } .delta.flat { color: var(--ink-2); }
+.tile .basis, .tile .more { font-size: 11px; color: var(--muted); }
+.flag { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px;
+  background: var(--warning); color: #0b0b0b; white-space: nowrap; }
+.spark { display: block; margin-top: 6px; width: 100%; height: 32px; }
+.spark-line { stroke: var(--series-soft); stroke-width: 2; }
+.spark-dot { fill: var(--series); }
+.row2 { display: grid; gap: 12px; grid-template-columns: 2fr 1fr; }
+.row3 { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+.banner { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 4px;
+  background: var(--page); margin-bottom: 10px; font-size: 13px; }
+.ai-headline { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
+.ai ul { margin: 0 0 8px; padding-left: 18px; } .ai li { margin: 2px 0; }
+.ai h3 { font-size: 12px; color: var(--ink-2); margin: 8px 0 2px; font-weight: 600; }
+.ai .meta { font-size: 11px; color: var(--muted); margin-top: 8px; }
+.decomp { display: grid; gap: 6px; }
+.decomp div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--grid); padding: 4px 0; }
+.decomp .op { color: var(--muted); text-align: center; border: 0; display: block; padding: 0; }
+.num { font-variant-numeric: tabular-nums; }
+.chart { width: 100%; height: auto; display: block; }
+.chart .grid { stroke: var(--grid); stroke-width: 1; } .chart .axis { stroke: var(--axis); stroke-width: 1; }
+.chart .tick { fill: var(--muted); font-size: 10px; }
+.chart .series { stroke: var(--series); stroke-width: 2; stroke-linejoin: round; }
+.chart .xhair { stroke: var(--muted); stroke-width: 1; } .chart .xdot { fill: var(--series); stroke: var(--card); stroke-width: 2; }
+.tip { position: fixed; pointer-events: none; background: var(--card); color: var(--ink); border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,.18); border-radius: 4px; padding: 6px 8px; font-size: 12px; display: none; z-index: 10; }
+.tip strong { display: block; font-size: 14px; }
+.funnel-row { display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; margin: 6px 0; }
+.funnel-bar { height: 22px; background: var(--series); border-radius: 0 4px 4px 0; min-width: 2px; }
+.funnel-meta { font-size: 12px; color: var(--ink-2); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-weight: 600; color: var(--ink-2); font-size: 12px; border-bottom: 1px solid var(--axis); padding: 6px; }
+td { border-bottom: 1px solid var(--grid); padding: 6px; vertical-align: top; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+.table-wrap { overflow-x: auto; }
+nav.tabs { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border);
+  display: flex; gap: 2px; padding: 0 16px; overflow-x: auto; }
+nav.tabs a { padding: 10px 14px; color: var(--ink-2); text-decoration: none; font-size: 13px; white-space: nowrap;
+  border-top: 3px solid transparent; }
+nav.tabs a.active { color: var(--ink); font-weight: 600; border-top-color: var(--warning); }
+footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
+@media (max-width: 1100px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } .row2, .row3 { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tile .value { font-size: 20px; } }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <h1>GA4 Merch Shop · 운영 KPI 리포트</h1>
+  <span class="sub">기준일 {{ day }} ({{ weekday }}) · 공개 샘플 데이터를 하루씩 리플레이</span>
+</header>
+
+<div class="slicers">
+  <div class="slicer">
+    <label for="day">날짜</label>
+    <select id="day">
+      {% for d in days %}<option value="{{ d }}" {% if d == day %}selected{% endif %}>{{ d }}</option>{% endfor %}
+    </select>
+  </div>
+  <span class="pill"><span class="dot {{ status[0] }}">{{ status[1] }}</span>데이터 상태: {{ status[2] }}</span>
+</div>
+
+<main>
+<!-- Page 1: overview -->
+<section class="page" id="overview">
+  <div class="tiles">
+    {% for t in tiles %}
+    <div class="visual tile">
+      <div class="label"><span>{{ t.label }}</span>{% if t.notable %}<span class="flag">주목</span>{% endif %}</div>
+      <div class="value num">{{ t.value }}</div>
+      <div class="delta {{ 'up' if t.delta_sign > 0 else 'down' if t.delta_sign < 0 else 'flat' }}">
+        {{ '▲' if t.delta_sign > 0 else '▼' if t.delta_sign < 0 else '' }} {{ t.delta }}</div>
+      <div class="basis">{{ t.basis }}</div>
+      <div class="more">같은 요일 {{ t.wow }} · 전월 누적 {{ t.mom }}</div>
+      {{ t.spark | safe }}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="row2">
+    <div class="visual ai">
+      <h2>AI 일일 코멘트</h2>
+      <div class="banner"><span class="dot {{ status[0] }}">{{ status[1] }}</span><span>{{ status[3] }}</span></div>
+      {% if ai.ok %}
+        <p class="ai-headline">{{ ai.headline }}</p>
+        {% if ai.highlights %}<h3>주목할 변화</h3><ul>{% for h in ai.highlights %}<li>{{ h.text }}</li>{% endfor %}</ul>{% endif %}
+        {% if ai.watch_items %}<h3>확인할 것</h3><ul>{% for w in ai.watch_items %}<li>{{ w }}</li>{% endfor %}</ul>{% endif %}
+        <h3>데이터 품질</h3><p class="note">{{ ai.dq_note }}</p>
+        <p class="meta">{{ ai.model }}가 작성했어요. 문장 속 숫자는 모두 SQL 집계 결과에서 채워 넣었어요.</p>
+      {% else %}
+        <p class="note">{{ ai.reason }} 아래 숫자는 SQL 집계 결과 그대로라 그대로 볼 수 있어요.</p>
+        {% if ai.errors %}<ul class="note">{% for e in ai.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      {% endif %}
+    </div>
+    <div class="visual">
+      <h2>매출 분해 (최근 7일, 직전 7일 대비)</h2>
+      <div class="decomp">
+        {% for d in decomposition %}
+          {% if loop.index == 2 or loop.index == 3 %}<span class="op">×</span>{% elif loop.index == 4 %}<span class="op">≈</span>{% endif %}
+          <div><span>{{ d.label }}</span><span class="num">{{ d.value }} <span class="funnel-meta">({{ d.change }})</span></span></div>
+        {% endfor %}
+      </div>
+      <p class="note" style="margin-top:8px">한 세션에 주문이 여러 건인 경우가 있어 근사식이에요.</p>
+    </div>
+  </div>
+
+  <div class="row3">
+    <div class="visual"><h2>매출 · 최근 28일</h2>{{ charts.revenue | safe }}</div>
+    <div class="visual"><h2>세션 · 최근 28일</h2>{{ charts.sessions | safe }}</div>
+  </div>
+</section>
+
+<!-- Page 2: funnel + metric detail -->
+<section class="page" id="funnel">
+  <div class="visual">
+    <h2>구매 퍼널 (최근 7일 세션)</h2>
+    {% if funnel_warn %}<div class="banner"><span class="dot warning">!</span><span>장바구니 이벤트 수집 누락이 의심돼요 (DQ08). 장바구니·체크아웃 단계 비율은 해석하지 마세요.</span></div>{% endif %}
+    {% for s in funnel %}
+    <div class="funnel-row">
+      <span>{{ s.label }}</span>
+      <div><div class="funnel-bar" style="width: {{ '%.1f' % s.pct }}%" title="{{ s.label }} {{ s.value }}"></div>
+        <span class="funnel-meta num">{{ s.value }} 세션 · 전체의 {{ '%.1f' % s.pct }}%{% if s.step %} · {{ s.step }}{% endif %}</span></div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="visual">
+    <h2>지표 상세 (지표 정의집 Tier 1·2)</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>지표</th><th class="r">당일</th><th class="r">전일 대비</th><th class="r">같은 요일 대비</th><th class="r">7일 vs 직전 7일</th><th class="r">전월 누적 대비</th><th>판정</th></tr></thead>
+      <tbody>{% for r in detail %}
+        <tr><td>{{ r.name }}</td><td class="r">{{ r.day }}</td><td class="r">{{ r.dod }}</td><td class="r">{{ r.wow }}</td>
+        <td class="r">{{ r.r7 }}</td><td class="r">{{ r.mom }}</td>
+        <td>{% if r.flag == 'hold' %}보류{% elif r.flag == 'notable' %}<span class="flag">주목</span>{% elif r.flag == 'normal' %}정상{% else %}–{% endif %}</td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+    <p class="note" style="margin-top:8px">비율 지표는 %p 차이, 나머지는 증감률이에요. 판정은 지표 정의집의 비교 기준과 임계치를 따라요.</p>
+  </div>
+</section>
+
+<!-- Page 3: data quality -->
+<section class="page" id="quality">
+  <div class="visual">
+    <h2>데이터 품질 체크와 집계 대사</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>상태</th><th>체크</th><th>기준</th><th>세부</th></tr></thead>
+      <tbody>{% for r in dq %}
+        <tr><td><span class="pill"><span class="dot {{ r.badge[0] }}">{{ r.badge[1] }}</span>{{ r.badge[2] }}</span></td>
+        <td>{{ r.check_name }}<br><span class="funnel-meta">{{ r.check_id }}</span></td>
+        <td class="funnel-meta">{{ r.threshold }}</td><td class="funnel-meta">{{ r.detail }}</td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+    <p class="note" style="margin-top:8px">DQ는 데이터 품질 체크, R은 같은 숫자를 다른 단위로 계산해 맞춰보는 대사 규칙이에요. 하나라도 실패하면 그날 리포트는 해석 보류로 표시돼요.</p>
+  </div>
+</section>
+<footer>생성 {{ generated }} · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
+</main>
+
+<nav class="tabs">
+  <a href="#overview">개요</a><a href="#funnel">퍼널 · 지표 상세</a><a href="#quality">데이터 품질</a>
+</nav>
+<div class="tip" id="tip"></div>
+
+<script>
+// Page tabs (hash-based, like Power BI report pages)
+function showPage() {
+  const id = (location.hash || "#overview").slice(1);
+  document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === id));
+  document.querySelectorAll("nav.tabs a").forEach(a => a.classList.toggle("active", a.hash === "#" + id));
+}
+addEventListener("hashchange", showPage); showPage();
+
+// Date slicer: each day is its own static page
+document.getElementById("day").addEventListener("change", e => { location.href = e.target.value + ".html" + location.hash; });
+
+// Line chart crosshair + tooltip
+const tip = document.getElementById("tip");
+document.querySelectorAll("svg.chart").forEach(svg => {
+  const d = JSON.parse(svg.dataset.points);
+  const hair = svg.querySelector(".xhair"), dot = svg.querySelector(".xdot");
+  svg.querySelector(".hit").addEventListener("pointermove", ev => {
+    const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    const x = pt.matrixTransform(svg.getScreenCTM().inverse()).x;
+    let i = 0; d.x.forEach((v, k) => { if (Math.abs(v - x) < Math.abs(d.x[i] - x)) i = k; });
+    hair.setAttribute("x1", d.x[i]); hair.setAttribute("x2", d.x[i]);
+    if (d.y[i] !== null) { dot.setAttribute("cx", d.x[i]); dot.setAttribute("cy", d.y[i]); }
+    tip.replaceChildren();
+    const s = document.createElement("strong"); s.textContent = d.labels[i];
+    tip.append(s, document.createTextNode(d.dates[i]));
+    tip.style.display = "block"; tip.style.left = (ev.clientX + 12) + "px"; tip.style.top = (ev.clientY - 40) + "px";
+  });
+  svg.querySelector(".hit").addEventListener("pointerleave", () => {
+    tip.style.display = "none"; hair.setAttribute("x1", -10); hair.setAttribute("x2", -10); dot.setAttribute("cx", -10);
+  });
+});
+</script>
+</body>
+</html>

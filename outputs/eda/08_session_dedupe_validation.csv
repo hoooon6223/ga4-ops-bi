@@ -1,0 +1,12 @@
+k,v
+sessions_with_null_tid,813
+sessions_multi_purchase_evt,552
+sessions_mixed_tid_and_null,9
+dup_tid_same_session,311
+dup_tid_groups,326
+orders_dedup_tid_plus_null_by_session_rev,5283
+orders_dedup_tid_plus_null_events,5357
+purchase_sessions,4848
+sessions_null_tid_multi_evt,38
+purchase_events,5692
+sessions_multi_distinct_tid,236

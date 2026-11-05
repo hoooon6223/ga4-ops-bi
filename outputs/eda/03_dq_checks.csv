@@ -1,0 +1,12 @@
+chk,n,base
+purchase_item_rev_mismatch_gt1pct,722,5242
+purchase_no_items,2,5692
+purchase_rev_negative,0,5692
+purchase_dup_tid_rows,661,5692
+purchase_rev_zero,0,5692
+purchase_dup_tid_distinct,326,5692
+purchase_tid_null_or_notset,906,5692
+purchase_rev_null,450,5692
+purchase_dup_tid_multi_day,15,5692
+events_null_user,0,4295584
+events_null_ga_session_id,0,4295584

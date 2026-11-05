@@ -1,0 +1,6 @@
+grain,orders,revenue,null_rev_orders
+A_event_grain,5692,362165.0,450
+B_order_grain_dedup,5283,338153.0,411
+C_session_grain_rollup,4837,338153.0,
+D_orders_with_tid,4451,307640.0,0
+E_orders_without_tid,832,30513.0,411
