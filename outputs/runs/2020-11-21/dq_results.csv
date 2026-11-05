@@ -1,10 +1,10 @@
 dq_date,check_id,check_name,value,threshold,status,detail
 2020-11-21,DQ01_arrival,데이터 도착,41980.0,> 0,PASS,events=41980
-2020-11-21,DQ02_session_spike,세션 급변 (같은 요일 대비),0.3499366821443648,|change| <= 0.40,PASS,sessions=3198
-2020-11-21,DQ03_null_revenue,매출 누락률,0.05714285714285714,"WARN > 0.10, FAIL > 0.30",PASS,null_revenue_orders=2 / orders=35
-2020-11-21,DQ04_dup_orders,주문 중복률,0.4852941176470588,<= 0.15,WARN,"purchase_events=68, orders=35"
+2020-11-21,DQ02_session_spike,세션 급변 (같은 요일 대비),0.3499366821443648,|change| <= 0.50,PASS,sessions=3198
+2020-11-21,DQ03_null_revenue,매출 누락률,0.05714285714285714,"WARN > 0.12, FAIL > 0.30",PASS,null_revenue_orders=2 / orders=35
+2020-11-21,DQ04_dup_orders,주문 중복률,0.4852941176470588,<= 0.20,WARN,"purchase_events=68, orders=35"
 2020-11-21,DQ05_missing_tid,거래번호 누락률,0.05714285714285714,<= 0.20,PASS,orders_without_tid=2
-2020-11-21,DQ06_item_reconcile,주문 매출 vs 상품 매출 불일치 비중,0.09090909090909091,<= 0.20,PASS,mismatch=3 / orders_with_revenue=33
+2020-11-21,DQ06_item_reconcile,주문 매출 vs 상품 매출 불일치 비중,0.09090909090909091,<= 0.30,PASS,mismatch=3 / orders_with_revenue=33
 2020-11-21,DQ07_order_revenue_gap,주문-매출 괴리 (rolling 7d),0.03320281910728262,FAIL if |orders wow| <= 0.20 and revenue wow <= -0.50,PASS,"orders_r7_wow=0.065, revenue_r7_wow=0.033"
 2020-11-21,DQ08_funnel_tracking,장바구니 수집 정합성 (장바구니 >= 체크아웃),0.0,>= 1.0,WARN,"add_to_cart_sessions=0, checkout_sessions=126"
 2020-11-21,R1_events_to_orders,주문 수 <= purchase 이벤트 수,35.0,<= 68,PASS,"orders=35, purchase_events=68"

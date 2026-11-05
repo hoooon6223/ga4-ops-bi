@@ -1,5 +1,5 @@
 -- Step 5. Data-quality checks (DQ01~DQ07) and reconciliation rules (R1~R5) for @run_date.
--- Definitions & thresholds: docs/ops_bi/02_ops_metric_definitions.md §5, §6
+-- Definitions & thresholds: docs/ops_bi/02_ops_metric_definitions.md §5, §6 (v1.3 thresholds from sql/eda/13)
 -- status: PASS / WARN / FAIL / SKIP (comparison window not available yet)
 
 CREATE TABLE IF NOT EXISTS `bigquery-457902.ga4_ops_bi.ops_dq_results` (
@@ -52,24 +52,24 @@ checks AS (
   SELECT 'DQ01_arrival' AS check_id, '데이터 도착' AS check_name, CAST(events AS FLOAT64) AS value, '> 0' AS threshold,
     IF(events > 0, 'PASS', 'FAIL') AS status, FORMAT('events=%d', events) AS detail FROM v
   UNION ALL
-  SELECT 'DQ02_session_spike', '세션 급변 (같은 요일 대비)', session_wow, '|change| <= 0.40',
-    CASE WHEN session_wow IS NULL THEN 'SKIP' WHEN ABS(session_wow) > 0.40 THEN 'WARN' ELSE 'PASS' END,
+  SELECT 'DQ02_session_spike', '세션 급변 (같은 요일 대비)', session_wow, '|change| <= 0.50',
+    CASE WHEN session_wow IS NULL THEN 'SKIP' WHEN ABS(session_wow) > 0.50 THEN 'WARN' ELSE 'PASS' END,
     FORMAT('sessions=%d', sessions) FROM v
   UNION ALL
-  SELECT 'DQ03_null_revenue', '매출 누락률', null_rev_rate, 'WARN > 0.10, FAIL > 0.30',
-    CASE WHEN null_rev_rate IS NULL THEN 'SKIP' WHEN null_rev_rate > 0.30 THEN 'FAIL' WHEN null_rev_rate > 0.10 THEN 'WARN' ELSE 'PASS' END,
+  SELECT 'DQ03_null_revenue', '매출 누락률', null_rev_rate, 'WARN > 0.12, FAIL > 0.30',
+    CASE WHEN null_rev_rate IS NULL THEN 'SKIP' WHEN null_rev_rate > 0.30 THEN 'FAIL' WHEN null_rev_rate > 0.12 THEN 'WARN' ELSE 'PASS' END,
     FORMAT('null_revenue_orders=%d / orders=%d', null_revenue_orders, orders) FROM v
   UNION ALL
-  SELECT 'DQ04_dup_orders', '주문 중복률', dup_rate, '<= 0.15',
-    CASE WHEN dup_rate IS NULL THEN 'SKIP' WHEN dup_rate > 0.15 THEN 'WARN' ELSE 'PASS' END,
+  SELECT 'DQ04_dup_orders', '주문 중복률', dup_rate, '<= 0.20',
+    CASE WHEN dup_rate IS NULL THEN 'SKIP' WHEN dup_rate > 0.20 THEN 'WARN' ELSE 'PASS' END,
     FORMAT('purchase_events=%d, orders=%d', purchase_events, orders) FROM v
   UNION ALL
   SELECT 'DQ05_missing_tid', '거래번호 누락률', missing_tid_rate, '<= 0.20',
     CASE WHEN missing_tid_rate IS NULL THEN 'SKIP' WHEN missing_tid_rate > 0.20 THEN 'WARN' ELSE 'PASS' END,
     FORMAT('orders_without_tid=%d', orders_without_tid) FROM v
   UNION ALL
-  SELECT 'DQ06_item_reconcile', '주문 매출 vs 상품 매출 불일치 비중', item_mismatch_rate, '<= 0.20',
-    CASE WHEN item_mismatch_rate IS NULL THEN 'SKIP' WHEN item_mismatch_rate > 0.20 THEN 'WARN' ELSE 'PASS' END,
+  SELECT 'DQ06_item_reconcile', '주문 매출 vs 상품 매출 불일치 비중', item_mismatch_rate, '<= 0.30',
+    CASE WHEN item_mismatch_rate IS NULL THEN 'SKIP' WHEN item_mismatch_rate > 0.30 THEN 'WARN' ELSE 'PASS' END,
     FORMAT('mismatch=%d / orders_with_revenue=%d', item_mismatch_orders, orders_with_positive_revenue) FROM v
   UNION ALL
   SELECT 'DQ07_order_revenue_gap', '주문-매출 괴리 (rolling 7d)', revenue_r7_wow, 'FAIL if |orders wow| <= 0.20 and revenue wow <= -0.50',

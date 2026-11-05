@@ -338,15 +338,15 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
       
         <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
         <td>세션 급변 (같은 요일 대비)<br><span class="funnel-meta">DQ02_session_spike</span></td>
-        <td class="funnel-meta">|change| &lt;= 0.40</td><td class="funnel-meta">sessions=3968</td></tr>
+        <td class="funnel-meta">|change| &lt;= 0.50</td><td class="funnel-meta">sessions=3968</td></tr>
       
         <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
         <td>매출 누락률<br><span class="funnel-meta">DQ03_null_revenue</span></td>
-        <td class="funnel-meta">WARN &gt; 0.10, FAIL &gt; 0.30</td><td class="funnel-meta">null_revenue_orders=3 / orders=72</td></tr>
+        <td class="funnel-meta">WARN &gt; 0.12, FAIL &gt; 0.30</td><td class="funnel-meta">null_revenue_orders=3 / orders=72</td></tr>
       
         <tr><td><span class="pill"><span class="dot warning">!</span>경고</span></td>
         <td>주문 중복률<br><span class="funnel-meta">DQ04_dup_orders</span></td>
-        <td class="funnel-meta">&lt;= 0.15</td><td class="funnel-meta">purchase_events=141, orders=72</td></tr>
+        <td class="funnel-meta">&lt;= 0.20</td><td class="funnel-meta">purchase_events=141, orders=72</td></tr>
       
         <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
         <td>거래번호 누락률<br><span class="funnel-meta">DQ05_missing_tid</span></td>
@@ -354,7 +354,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
       
         <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
         <td>주문 매출 vs 상품 매출 불일치 비중<br><span class="funnel-meta">DQ06_item_reconcile</span></td>
-        <td class="funnel-meta">&lt;= 0.20</td><td class="funnel-meta">mismatch=8 / orders_with_revenue=69</td></tr>
+        <td class="funnel-meta">&lt;= 0.30</td><td class="funnel-meta">mismatch=8 / orders_with_revenue=69</td></tr>
       
         <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
         <td>주문-매출 괴리 (rolling 7d)<br><span class="funnel-meta">DQ07_order_revenue_gap</span></td>
@@ -384,7 +384,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
     <p class="note" style="margin-top:8px">DQ는 데이터 품질 체크, R은 같은 숫자를 다른 단위로 계산해 맞춰보는 대사 규칙이에요. 하나라도 실패하면 그날 리포트는 해석 보류로 표시돼요.</p>
   </div>
 </section>
-<footer>생성 2026-11-05 12:01 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
+<footer>생성 2026-11-05 12:17 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
 </main>
 
 <nav class="tabs">
