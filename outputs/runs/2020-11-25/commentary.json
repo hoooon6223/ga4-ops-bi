@@ -1,5 +1,19 @@
 {
-  "ok": false,
+  "ok": true,
   "status": "caution",
-  "reason": "AI 요약 실패: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CgjQ6VLA5X6Wq5JSyLJZG'}"
+  "model": "claude-opus-5-5",
+  "headline": "오늘 notable 지표는 장바구니율 하락이며, 품질 체크 '장바구니 수집 정합성'이 WARN({{DQ08_funnel_tracking.value}})이라 장바구니율은 해석 보류예요.",
+  "highlights": [
+    {
+      "metric_id": "D02_add_to_cart_rate",
+      "direction": "down",
+      "text": "장바구니율이 최근 7일 vs 직전 7일 기준 {{D02_add_to_cart_rate.r7_change}} 변했어요. 최근 7일 값은 {{D02_add_to_cart_rate.r7_value}}이고, 품질 경고가 있어 해석 보류예요."
+    }
+  ],
+  "watch_items": [
+    "장바구니율: 최근 7일 vs 직전 7일 변화량({{D02_add_to_cart_rate.r7_change}})이 임계치를 넘었어요.",
+    "장바구니 수집 정합성: 값 {{DQ08_funnel_tracking.value}}로 WARN이 떴어요. 다음 리포트에서도 WARN이 유지되는지 확인이 필요해요.",
+    "전체 지표: 전월 누적 값이 비어 있어 전월 대비 비교 기준이 없어요."
+  ],
+  "data_quality_note": "'장바구니 수집 정합성' 체크가 WARN({{DQ08_funnel_tracking.value}})이고, 나머지 체크는 모두 PASS예요. 해석 보류 대상은 장바구니율이에요."
 }
