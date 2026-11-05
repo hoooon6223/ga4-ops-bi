@@ -1,5 +1,28 @@
 {
-  "ok": false,
+  "ok": true,
   "status": "normal",
-  "reason": "AI 요약 실패: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CgjQuWPiAh8eQnovtY9gv'}"
+  "model": "claude-opus-5-5",
+  "headline": "매출, 주문 수, 세션 전환율, 장바구니율이 최근 7일 기준 직전 7일 대비 올라 notable로 판정됐어요.",
+  "highlights": [
+    {
+      "metric_id": "K01_revenue",
+      "direction": "up",
+      "text": "매출은 최근 7일 기준 직전 7일 대비 {{K01_revenue.r7_change}} 올라 임계치를 넘었어요."
+    },
+    {
+      "metric_id": "K02_orders",
+      "direction": "up",
+      "text": "주문 수는 최근 7일 기준 직전 7일 대비 {{K02_orders.r7_change}} 올라 임계치를 넘었어요."
+    },
+    {
+      "metric_id": "K05_session_cvr",
+      "direction": "up",
+      "text": "세션 전환율은 최근 7일 기준 직전 7일 대비 {{K05_session_cvr.r7_change}} 올라 임계치를 넘었어요."
+    }
+  ],
+  "watch_items": [
+    "장바구니율: 최근 7일 기준 직전 7일 대비 {{D02_add_to_cart_rate.r7_change}} 변해 임계치를 넘었어요(notable). 다음 리포트에서도 같은 기준으로 살펴봐요.",
+    "매출, 주문 수, 세션 전환율: 최근 7일 변화가 임계치를 넘었어요. 다음 리포트에서도 같은 기준으로 살펴봐요."
+  ],
+  "data_quality_note": "모든 품질 체크가 PASS이고 해석 보류 대상 지표는 없어요. 주문 매출 vs 상품 매출 불일치 비중은 {{DQ06_item_reconcile.value}}로 PASS예요."
 }
