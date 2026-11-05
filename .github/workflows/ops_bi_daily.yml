@@ -1,11 +1,11 @@
 name: ops-bi-daily
 
-# Replay: each run loads the next data day (2020-11-01 ~ 2021-01-31).
-# Manual-run only until the secrets are set and one manual run succeeds.
-# Then enable the schedule below (hourly = one data day per hour; "0 0 * * *" = one per real day).
+# Replay: each run loads the next data day (2020-11-01 ~ 2021-01-31), one data day per real day.
+# Runs every day at 09:00 KST (cron is UTC: 00:00 UTC = 09:00 KST).
+# GitHub may start scheduled runs a few minutes late.
 on:
-  # schedule:
-  #   - cron: "0 * * * *"
+  schedule:
+    - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       date:
