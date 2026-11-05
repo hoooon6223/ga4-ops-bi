@@ -1,18 +1,17 @@
 {
   "ok": true,
-  "status": "normal",
   "model": "claude-opus-5-5",
-  "headline": "장바구니율이 최근 7일 기준 직전 7일보다 하락해 오늘 유일한 notable 지표예요.",
+  "headline": "주목: 장바구니율 (최근 7일 vs 직전 7일).",
   "highlights": [
     {
       "metric_id": "D02_add_to_cart_rate",
       "direction": "down",
-      "text": "장바구니율은 최근 7일 기준 직전 7일 대비 {{D02_add_to_cart_rate.r7_change}} 변했어요. 최근 7일 값은 {{D02_add_to_cart_rate.r7_value}}이에요."
+      "text": "장바구니율: 최근 7일 vs 직전 7일 {{D02_add_to_cart_rate.r7_change}} (주목)."
     }
   ],
   "watch_items": [
-    "장바구니율: 최근 7일 vs 직전 7일 변화가 임계치를 넘었어요. 다음 리포트에서도 확인이 필요해요.",
-    "전체 지표: 전월 동기간 값이 비어 있어 월 누적 비교 기준이 없어요."
-  ],
-  "data_quality_note": "모든 데이터 품질 체크가 PASS예요. 해석 보류 대상 지표는 없어요."
+    "매출: 전월 같은 기간 대비 값 없음.",
+    "주문 수: 전월 같은 기간 대비 값 없음.",
+    "세션 전환율: 전월 같은 기간 대비 값 없음."
+  ]
 }
