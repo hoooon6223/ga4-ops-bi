@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "model": "claude-opus-5-5",
+  "headline": "주목: 장바구니율 (최근 7일 vs 직전 7일).",
+  "highlights": [
+    {
+      "metric_id": "D02_add_to_cart_rate",
+      "direction": "up",
+      "text": "장바구니율: 최근 7일 vs 직전 7일 {{D02_add_to_cart_rate.r7_change}} (주목)."
+    }
+  ],
+  "watch_items": [
+    "장바구니율: 최근 7일 vs 직전 7일의 기준값 {{D02_add_to_cart_rate.r7_prev}}.",
+    "장바구니율: 전월 같은 기간 대비의 기준값 {{D02_add_to_cart_rate.mtd_prev_month}}."
+  ]
+}
