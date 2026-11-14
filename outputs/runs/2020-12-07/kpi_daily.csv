@@ -1,0 +1,2 @@
+kpi_date,sessions,active_users,new_users,order_sessions,orders,orders_with_revenue,revenue,buyers,view_item_sessions,add_to_cart_sessions,checkout_sessions,session_orders,session_revenue,orders_without_tid,null_revenue_orders,item_mismatch_orders,orders_with_positive_revenue,events,purchase_events,raw_purchase_sessions,raw_revenue
+2020-12-07,5461,4709,3741,91,108,104,8415.0,89,1215,373,203,108,8415.0,4,4,11,104,71632,110,91,8472.0

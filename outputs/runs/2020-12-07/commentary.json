@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "model": "claude-opus-5-5",
+  "headline": "주목: 세션 전환율, 객단가, 장바구니율 (최근 7일 vs 직전 7일).",
+  "highlights": [
+    {
+      "metric_id": "K05_session_cvr",
+      "direction": "down",
+      "text": "세션 전환율: 최근 7일 vs 직전 7일 {{K05_session_cvr.r7_change}} (주목)."
+    },
+    {
+      "metric_id": "K06_aov",
+      "direction": "down",
+      "text": "객단가: 최근 7일 vs 직전 7일 {{K06_aov.r7_change}} (주목)."
+    },
+    {
+      "metric_id": "D02_add_to_cart_rate",
+      "direction": "up",
+      "text": "장바구니율: 최근 7일 vs 직전 7일 {{D02_add_to_cart_rate.r7_change}} (주목)."
+    }
+  ],
+  "watch_items": [
+    "장바구니율: 전월 같은 기간 대비의 기준값 {{D02_add_to_cart_rate.mtd_prev_month}}."
+  ]
+}
