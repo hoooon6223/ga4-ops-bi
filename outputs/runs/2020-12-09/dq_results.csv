@@ -1,0 +1,13 @@
+dq_date,check_id,check_name,value,threshold,status,detail
+2020-12-09,DQ01_arrival,데이터 도착,82315.0,> 0,PASS,events=82315
+2020-12-09,DQ02_session_spike,세션 급변 (같은 요일 대비),0.3066057332779393,|change| <= 0.50,PASS,sessions=6290
+2020-12-09,DQ03_null_revenue,매출 누락률,0.034482758620689655,"WARN > 0.12, FAIL > 0.30",PASS,null_revenue_orders=5 / orders=145
+2020-12-09,DQ04_dup_orders,주문 중복률,0.03333333333333333,<= 0.20,PASS,"purchase_events=150, orders=145"
+2020-12-09,DQ05_missing_tid,거래번호 누락률,0.034482758620689655,<= 0.20,PASS,orders_without_tid=5
+2020-12-09,DQ06_item_reconcile,주문 매출 vs 상품 매출 불일치 비중,0.12857142857142856,<= 0.30,PASS,mismatch=18 / orders_with_revenue=140
+2020-12-09,DQ07_order_revenue_gap,주문-매출 괴리 (rolling 7d),0.06345857155821766,FAIL if |orders wow| <= 0.20 and revenue wow <= -0.50,PASS,"orders_r7_wow=0.132, revenue_r7_wow=0.063"
+2020-12-09,DQ08_funnel_tracking,장바구니 수집 정합성 (장바구니 >= 체크아웃),1.6395348837209303,>= 1.0,PASS,"add_to_cart_sessions=423, checkout_sessions=258"
+2020-12-09,R1_events_to_orders,주문 수 <= purchase 이벤트 수,145.0,<= 150,PASS,"orders=145, purchase_events=150"
+2020-12-09,R2_order_session_rollup,주문 = 세션 합산 (건수·매출),0.0,diff = 0,PASS,"orders=145 vs 145, revenue=10443.00 vs 10443.00"
+2020-12-09,R3_order_sessions,주문 세션 수 <= 원본 purchase 세션 수,130.0,<= 131,PASS,"order_sessions=130, raw_purchase_sessions=131"
+2020-12-09,R5_dedup_revenue,중복 제거 매출 <= 원본 매출,10443.0,<= 10863.00,PASS,"revenue=10443.00, raw_revenue=10863.00"
