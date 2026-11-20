@@ -4,28 +4,6 @@
 --   Keep the first event per order_key. Skip keys already loaded on earlier days (cross-day re-sends).
 -- Idempotent: the @run_date partition is deleted and rebuilt.
 
-CREATE TABLE IF NOT EXISTS `bigquery-457902.ga4_ops_bi.ops_f_orders` (
-  order_date DATE,
-  order_key STRING,
-  transaction_id STRING,
-  session_id STRING,
-  user_pseudo_id STRING,
-  order_ts INT64,
-  purchase_revenue FLOAT64,
-  item_revenue FLOAT64,
-  has_revenue BOOL,
-  has_tid BOOL,
-  purchase_events INT64,
-  device_category STRING,
-  country STRING,
-  medium STRING,
-  loaded_at TIMESTAMP
-)
-PARTITION BY order_date;
-
--- Delete + insert are one transaction: a failure leaves the day's previous rows untouched.
-BEGIN TRANSACTION;
-
 DELETE FROM `bigquery-457902.ga4_ops_bi.ops_f_orders` WHERE order_date = @run_date;
 
 INSERT INTO `bigquery-457902.ga4_ops_bi.ops_f_orders`
@@ -83,5 +61,3 @@ WHERE order_key NOT IN (
   FROM `bigquery-457902.ga4_ops_bi.ops_f_orders`
   WHERE order_date < @run_date
 );
-
-COMMIT TRANSACTION;

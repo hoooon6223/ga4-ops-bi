@@ -129,7 +129,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
 <body>
 <header class="topbar">
   <h1>GA4 Merch Shop · 운영 KPI 리포트</h1>
-  <span class="sub">기준일 2020-11-03 (화) · 갱신 2026-11-20 16:27 KST ·
+  <span class="sub">기준일 2020-11-03 (화) · 갱신 2026-11-20 16:46 KST ·
     <span class="ok">숫자 검증 통과 ✓</span>
     · 공개 샘플 데이터를 하루씩 리플레이</span>
 </header>
@@ -387,6 +387,10 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
         <td class="funnel-meta">&lt;= 46</td><td class="funnel-meta">order_sessions=46, raw_purchase_sessions=46</td></tr>
       
         <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
+        <td>주문 수 = 거래번호 있는 주문 + 없는 주문<br><span class="funnel-meta">R4_tid_split</span></td>
+        <td class="funnel-meta">diff = 0</td><td class="funnel-meta">orders=47, with_tid=0, without_tid=47</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
         <td>중복 제거 매출 &lt;= 원본 매출<br><span class="funnel-meta">R5_dedup_revenue</span></td>
         <td class="funnel-meta">&lt;= 3313.00</td><td class="funnel-meta">revenue=3293.00, raw_revenue=3313.00</td></tr>
       
@@ -398,7 +402,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
     <p class="note" style="margin-top:8px">DQ는 데이터 품질 체크, R은 같은 숫자를 다른 단위로 계산해 맞춰보는 대사 규칙이에요. 하나라도 실패하면 그날 리포트는 해석 보류로 표시돼요.</p>
   </div>
 </section>
-<footer>생성 2026-11-20 16:27 KST · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
+<footer>생성 2026-11-20 16:46 KST · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
 </main>
 
 <nav class="tabs">

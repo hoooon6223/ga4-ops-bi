@@ -1,21 +1,8 @@
--- Step 5. Data-quality checks (DQ01~DQ08) and reconciliation rules (R1~R3, R5, R6) for @run_date.
+-- Step 5. Data-quality checks (DQ01~DQ08) and reconciliation rules (R1~R6) for @run_date.
 -- Definitions & thresholds: docs/ops_bi/02_ops_metric_definitions.md §5, §6 (v1.3 thresholds from sql/eda/13)
 -- status: PASS / WARN / FAIL / SKIP (comparison window not available yet)
-
-CREATE TABLE IF NOT EXISTS `bigquery-457902.ga4_ops_bi.ops_dq_results` (
-  dq_date DATE,
-  check_id STRING,
-  check_name STRING,
-  value FLOAT64,
-  threshold STRING,
-  status STRING,
-  detail STRING,
-  loaded_at TIMESTAMP
-)
-PARTITION BY dq_date;
-
--- Delete + insert are one transaction: a failure leaves the day's previous rows untouched.
-BEGIN TRANSACTION;
+-- Gate (end of file): a FAIL in DQ01 or any R check raises an error, so the whole day's
+-- transaction (steps 01~05) is rolled back and nothing is published.
 
 DELETE FROM `bigquery-457902.ga4_ops_bi.ops_dq_results` WHERE dq_date = @run_date;
 
@@ -35,6 +22,11 @@ r7p AS (
   SELECT COUNT(*) AS n, SUM(orders) AS orders, SUM(revenue) AS revenue
   FROM `bigquery-457902.ga4_ops_bi.ops_kpi_daily`
   WHERE kpi_date BETWEEN DATE_SUB(@run_date, INTERVAL 13 DAY) AND DATE_SUB(@run_date, INTERVAL 7 DAY)
+),
+-- R4 inputs: the order table split by whether the order has a transaction id.
+r4 AS (
+  SELECT COUNTIF(has_tid) AS with_tid, COUNTIF(NOT has_tid) AS without_tid
+  FROM `bigquery-457902.ga4_ops_bi.ops_f_orders` WHERE order_date = @run_date
 ),
 -- R6 inputs: 7-day values from the comparison table, bridge terms from the daily table.
 r6 AS (
@@ -112,6 +104,10 @@ checks AS (
   SELECT 'R3_order_sessions', '주문 세션 수 <= 원본 purchase 세션 수', CAST(order_sessions AS FLOAT64), FORMAT('<= %d', raw_purchase_sessions),
     IF(order_sessions <= raw_purchase_sessions, 'PASS', 'FAIL'), FORMAT('order_sessions=%d, raw_purchase_sessions=%d', order_sessions, raw_purchase_sessions) FROM v
   UNION ALL
+  SELECT 'R4_tid_split', '주문 수 = 거래번호 있는 주문 + 없는 주문', CAST(orders - with_tid - without_tid AS FLOAT64), 'diff = 0',
+    IF(orders = with_tid + without_tid, 'PASS', 'FAIL'),
+    FORMAT('orders=%d, with_tid=%d, without_tid=%d', orders, with_tid, without_tid) FROM v, r4
+  UNION ALL
   SELECT 'R5_dedup_revenue', '중복 제거 매출 <= 원본 매출', revenue, FORMAT('<= %.2f', raw_revenue),
     IF(revenue <= raw_revenue + 0.01, 'PASS', 'FAIL'), FORMAT('revenue=%.2f, raw_revenue=%.2f', revenue, raw_revenue) FROM v
   UNION ALL
@@ -132,4 +128,15 @@ SELECT
   CURRENT_TIMESTAMP() AS loaded_at
 FROM checks;
 
-COMMIT TRANSACTION;
+-- Gate: numbers that are wrong (R checks) or missing (DQ01) are never loaded.
+-- Source gaps such as DQ03/DQ07 FAIL are loaded and flagged on the dashboard instead.
+IF EXISTS (
+  SELECT 1 FROM `bigquery-457902.ga4_ops_bi.ops_dq_results`
+  WHERE dq_date = @run_date AND status = 'FAIL' AND (check_id LIKE 'R%' OR check_id = 'DQ01_arrival')
+) THEN
+  RAISE USING MESSAGE = (
+    SELECT FORMAT('OPS_BI_BLOCKED %t: %s', @run_date, STRING_AGG(FORMAT('%s (%s)', check_id, detail), '; ' ORDER BY check_id))
+    FROM `bigquery-457902.ga4_ops_bi.ops_dq_results`
+    WHERE dq_date = @run_date AND status = 'FAIL' AND (check_id LIKE 'R%' OR check_id = 'DQ01_arrival')
+  );
+END IF;

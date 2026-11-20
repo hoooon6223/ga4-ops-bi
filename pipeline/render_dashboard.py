@@ -39,6 +39,17 @@ DQ_BADGE = {"PASS": ("good", "✓", "통과"), "WARN": ("warning", "!", "경고"
             "FAIL": ("critical", "✕", "실패"), "SKIP": ("muted", "–", "건너뜀")}
 
 
+def needs_check(dq):
+    """FAIL checks that replace the header's "숫자 검증 통과 ✓" with a link to the quality tab.
+
+    R checks and DQ01 also stop the load in SQL, so they only show here if that gate is bypassed.
+    DQ03 and DQ07 FAIL mean the source is missing revenue: the day is loaded but flagged.
+    WARN results stay on the quality tab only.
+    """
+    return [r for r in dq if r["status"] == "FAIL"
+            and (r["check_id"].startswith("R") or r["check_id"].split("_")[0] in ("DQ01", "DQ03", "DQ07"))]
+
+
 def f(x):
     return float(x) if x not in (None, "") else None
 
@@ -140,9 +151,7 @@ def render(run_dir):
         terms = drilldown.three_terms(cur, prev) if where else []
     else:
         where, segments, terms = [], [], []
-    # Header trust line: calculation checks (R*) and data arrival only; quality warnings stay on their tab.
-    blocking = [r for r in dq if (r["check_id"].startswith("R") or r["check_id"].startswith("DQ01"))
-                and r["status"] == "FAIL"]
+    blocking = needs_check(dq)
 
     detail = [{"name": r["metric_name"], "tier": r["tier"], "day": fmt.value(r["metric_id"], r["unit"], r["value_day"]),
                "dod": fmt.change(r["unit"], r["dod_change"]), "wow": fmt.change(r["unit"], r["wow_day_change"]),

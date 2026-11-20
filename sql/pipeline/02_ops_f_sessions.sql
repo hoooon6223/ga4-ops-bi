@@ -2,28 +2,6 @@
 -- Grain: session_date x session_id. A session crossing midnight counts once on each day (GA4 export is split by event_date).
 -- Idempotent: the @run_date partition is deleted and rebuilt.
 
-CREATE TABLE IF NOT EXISTS `bigquery-457902.ga4_ops_bi.ops_f_sessions` (
-  session_date DATE,
-  session_id STRING,
-  user_pseudo_id STRING,
-  is_new_user BOOL,
-  has_view_item BOOL,
-  has_add_to_cart BOOL,
-  has_begin_checkout BOOL,
-  has_purchase_event BOOL,
-  orders INT64,
-  orders_with_revenue INT64,
-  revenue FLOAT64,
-  device_category STRING,
-  country STRING,
-  medium STRING,
-  loaded_at TIMESTAMP
-)
-PARTITION BY session_date;
-
--- Delete + insert are one transaction: a failure leaves the day's previous rows untouched.
-BEGIN TRANSACTION;
-
 DELETE FROM `bigquery-457902.ga4_ops_bi.ops_f_sessions` WHERE session_date = @run_date;
 
 INSERT INTO `bigquery-457902.ga4_ops_bi.ops_f_sessions`
@@ -80,5 +58,3 @@ SELECT
   CURRENT_TIMESTAMP() AS loaded_at
 FROM s
 LEFT JOIN o USING (session_id);
-
-COMMIT TRANSACTION;

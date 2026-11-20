@@ -4,34 +4,6 @@
 --   rate metrics  : change = (current - previous) * 100 (threshold is in %p)
 -- A window with missing days returns NULL (no comparison) instead of a misleading number.
 
-CREATE TABLE IF NOT EXISTS `bigquery-457902.ga4_ops_bi.ops_kpi_comparison` (
-  kpi_date DATE,
-  tier INT64,
-  metric_id STRING,
-  metric_name STRING,
-  unit STRING,
-  flag_basis STRING,
-  threshold FLOAT64,
-  value_day FLOAT64,
-  prev_day FLOAT64,
-  dod_change FLOAT64,
-  same_dow_last_week FLOAT64,
-  wow_day_change FLOAT64,
-  r7_value FLOAT64,
-  r7_prev FLOAT64,
-  r7_change FLOAT64,
-  mtd_value FLOAT64,
-  mtd_prev_month FLOAT64,
-  mom_change FLOAT64,
-  flag_change FLOAT64,
-  flag STRING,
-  loaded_at TIMESTAMP
-)
-PARTITION BY kpi_date;
-
--- Delete + insert are one transaction: a failure leaves the day's previous rows untouched.
-BEGIN TRANSACTION;
-
 DELETE FROM `bigquery-457902.ga4_ops_bi.ops_kpi_comparison` WHERE kpi_date = @run_date;
 
 INSERT INTO `bigquery-457902.ga4_ops_bi.ops_kpi_comparison`
@@ -152,5 +124,3 @@ SELECT
   END AS flag,
   CURRENT_TIMESTAMP() AS loaded_at
 FROM chg;
-
-COMMIT TRANSACTION;

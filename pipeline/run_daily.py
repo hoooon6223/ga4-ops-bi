@@ -55,10 +55,27 @@ def next_run_date():
     return nxt if nxt <= REPLAY_END else None
 
 
+class Blocked(Exception):
+    """A day that failed a blocking check (DQ01 or an R check): nothing was loaded."""
+
+
+def day_script():
+    """Steps 01-05 as one transaction. The gate at the end of 05 raises on a blocking FAIL,
+    which rolls back every table, so a bad day is never half-loaded or published."""
+    steps = "\n".join(p.read_text() for p in sorted(SQL_DIR.glob("0[1-5]_*.sql")))
+    return f"BEGIN TRANSACTION;\n\n{steps}\nCOMMIT TRANSACTION;\n"
+
+
 def aggregate(run_date):
-    """Steps 01-05 run as one BigQuery script, then results are exported as CSV."""
-    sql = "\n".join(p.read_text() for p in sorted(SQL_DIR.glob("0[1-5]_*.sql")))
-    bq.run_script(sql, run_date)
+    """Create tables if needed, run the day's transaction, then export the results as CSV."""
+    bq.run_script((SQL_DIR / "00_ops_tables.sql").read_text(), run_date)
+    try:
+        bq.run_script(day_script(), run_date)
+    except RuntimeError as e:
+        if "OPS_BI_BLOCKED" in str(e):
+            reason = str(e).split("OPS_BI_BLOCKED", 1)[1].strip().splitlines()[0].split(" at [")[0]
+            raise Blocked(reason) from None
+        raise
     run_dir = RUNS_DIR / str(run_date)
     run_dir.mkdir(parents=True, exist_ok=True)
     for name, query in EXPORTS.items():
@@ -77,7 +94,12 @@ def main(argv=None):
         print("Replay finished: all days up to", REPLAY_END, "are loaded.")
         return 0
 
-    run_dir = aggregate(run_date)
+    try:
+        run_dir = aggregate(run_date)
+    except Blocked as e:
+        # The failed run (and GitHub's failure email) is the alert. The same date is retried next run.
+        print(f"[{run_date}] BLOCKED, nothing loaded or published: {e}")
+        return 1
     print(f"[{run_date}] aggregated -> {run_dir.relative_to(ROOT)}")
 
     from pipeline import ai_summary, render_dashboard
