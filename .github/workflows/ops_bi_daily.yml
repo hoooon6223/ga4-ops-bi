@@ -1,11 +1,12 @@
 name: ops-bi-daily
 
 # Replay: each run loads the next data day (2020-11-01 ~ 2021-01-31), one data day per real day.
-# Runs every day at 09:00 KST (cron is UTC: 00:00 UTC = 09:00 KST).
-# GitHub may start scheduled runs a few minutes late.
+# Scheduled for 07:17 KST (cron is UTC: 22:17 UTC = 07:17 KST) so the report is ready before the
+# workday. GitHub delays on-the-hour schedules most, so the minute is off the hour; start times are
+# still not guaranteed (runs scheduled at 00:00 UTC started 4-5 hours late in Nov 2026).
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "17 22 * * *"
   workflow_dispatch:
     inputs:
       date:

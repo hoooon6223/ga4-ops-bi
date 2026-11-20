@@ -1,0 +1,9 @@
+dim,val,w,days,sessions,order_sessions
+기기,desktop,cur,2,3687,33
+기기,mobile,cur,2,2547,19
+기기,tablet,cur,2,122,1
+유입 매체,(none),cur,2,1450,12
+유입 매체,cpc,cur,2,284,2
+유입 매체,organic,cur,2,2137,12
+유입 매체,referral,cur,2,1170,15
+유입 매체,기타,cur,2,1315,12

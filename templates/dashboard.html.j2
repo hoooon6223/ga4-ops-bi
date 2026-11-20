@@ -9,7 +9,9 @@
 <body>
 <header class="topbar">
   <h1>GA4 Merch Shop · 운영 KPI 리포트</h1>
-  <span class="sub">기준일 {{ day }} ({{ weekday }}) · 공개 샘플 데이터를 하루씩 리플레이</span>
+  <span class="sub">기준일 {{ day }} ({{ weekday }}) · 갱신 {{ generated }} ·
+    {% if verified %}<span class="ok">숫자 검증 통과 ✓</span>{% else %}<a class="warn" href="#quality">숫자 확인 필요 (데이터 품질 탭)</a>{% endif %}
+    · 공개 샘플 데이터를 하루씩 리플레이</span>
 </header>
 
 <div class="slicers">
@@ -27,21 +29,49 @@
 <!-- Page 1: overview -->
 <section class="page" id="overview">
   <h2 class="print-only">1. 개요</h2>
+  <div class="row2 row-top">
+    <div class="visual today">
+      <h2>오늘 볼 것</h2>
+      {% if today %}
+        <ul class="today-list">{% for t in today %}
+          <li><span class="{{ 'up' if t.up else 'down' }}">{{ '▲' if t.up else '▼' }}</span>
+            <b>{{ t.name }}</b> {{ t.basis }} <span class="num">{{ t.change }}</span> <span class="flag">주목</span></li>
+        {% endfor %}</ul>
+      {% else %}
+        <p class="calm">오늘은 모든 헤드라인 지표가 평소 범위예요.</p>
+      {% endif %}
+    </div>
+    <div class="visual">
+      <h2>어디서 변했나 <span class="funnel-meta">최근 7일 vs 직전 7일</span></h2>
+      {% if where %}
+        <p class="terms num">{% for t in terms %}{{ t.label }} {{ t.change }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+        <ul class="where-list">{% for l in where %}<li{% if l.muted %} class="muted"{% endif %}>{{ l.text }}</li>{% endfor %}</ul>
+        <p class="note">무엇이 어디서 움직였는지까지만 보여줘요. 이유는 담당자가 확인해요.</p>
+      {% else %}
+        <p class="note">최근 14일 데이터가 모이면 표시돼요.</p>
+      {% endif %}
+    </div>
+  </div>
+
   <div class="tiles">
     {% for t in tiles %}
-    <div class="visual tile">
-      <div class="label"><span>{{ t.label }}</span>{% if t.notable %}<span class="flag">주목</span>{% endif %}</div>
+    <div class="visual tile" title="{{ t.label }}: {{ t.definition }}">
+      <div class="label"><span>{{ t.label }} <span class="info" aria-hidden="true">ⓘ</span></span>{% if t.notable %}<span class="flag">주목</span>{% endif %}</div>
       <div class="value num">{{ t.value }}</div>
       <div class="delta {{ 'up' if t.delta_sign > 0 else 'down' if t.delta_sign < 0 else 'flat' }}">
         {{ '▲' if t.delta_sign > 0 else '▼' if t.delta_sign < 0 else '' }} {{ t.delta }}</div>
       <div class="basis">{{ t.basis }}</div>
-      <div class="more">같은 요일 {{ t.wow }} · 전월 누적 {{ t.mom }}</div>
+      <div class="more">전일 {{ t.dod }} · 같은 요일 {{ t.wow }} · 최근 7일 {{ t.r7 }}</div>
       {{ t.spark | safe }}
     </div>
     {% endfor %}
   </div>
 
-  <div class="row2">
+  <div class="row3">
+    <div class="visual"><h2>매출 · 최근 28일</h2>{{ charts.revenue | safe }}</div>
+    <div class="visual"><h2>세션 · 최근 28일</h2>{{ charts.sessions | safe }}</div>
+  </div>
+  <div class="ai-row">
     <div class="visual ai">
       <h2>AI 일일 코멘트</h2>
       {% if ai.ok %}
@@ -54,27 +84,6 @@
         {% if ai.errors %}<ul class="note">{% for e in ai.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
       {% endif %}
     </div>
-    <div class="visual">
-      <h2>매출 분해 (최근 7일, 직전 7일 대비)</h2>
-      {% if decomposition %}
-      <div class="decomp">
-        <div class="decomp-head"><span>항</span><span>값 (변화)</span><span>기여도</span></div>
-        {% for d in decomposition %}
-          {% if loop.last %}<span class="op">=</span>{% elif not loop.first %}<span class="op">×</span>{% endif %}
-          <div><span>{{ d.label }}</span><span class="num">{{ d.value }} <span class="funnel-meta">({{ d.change }})</span></span><span class="num">{{ d.share }}</span></div>
-        {% endfor %}
-      </div>
-      <p class="note" style="margin-top:8px">다섯 항을 곱하면 매출과 정확히 같아요. 기여도는 매출 변화를 항별로 나눈 값이에요 (로그 분해, 합 100%).
-        {% if decomp_check %}정합성 체크(R6): {{ decomp_check.label }}.{% endif %}</p>
-      {% else %}
-      <p class="note">최근 14일 데이터가 모이면 표시돼요.</p>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="row3">
-    <div class="visual"><h2>매출 · 최근 28일</h2>{{ charts.revenue | safe }}</div>
-    <div class="visual"><h2>세션 · 최근 28일</h2>{{ charts.sessions | safe }}</div>
   </div>
 </section>
 
@@ -92,6 +101,23 @@
     </div>
     {% endfor %}
     <p class="note num" style="margin-top:8px">참고: 상품 조회 세션 중 장바구니에 담은 비율 {{ cart_rate }}</p>
+  </div>
+  <div class="visual">
+    <h2>세그먼트별 세션 전환율 (최근 7일 vs 직전 7일)</h2>
+    {% if segments %}
+    <div class="table-wrap"><table>
+      <thead><tr><th>구분</th><th>세그먼트</th><th class="r">세션</th><th class="r">비중 (변화)</th><th class="r">전환율 (변화)</th><th class="r">전체 전환율 변화 중 몫</th></tr></thead>
+      <tbody>{% for e in segments %}{% for g in e.segments %}
+        <tr><td>{{ e.dim if loop.first else '' }}</td><td>{{ g.label }}</td><td class="r">{{ '{:,.0f}'.format(g.sessions) }}</td>
+        <td class="r">{{ '%.1f' % (g.share * 100) }}% ({{ g.share_change_pp }})</td>
+        <td class="r">{% if g.small %}표본 적음{% else %}{{ '%.2f' % (g.cvr * 100) }}% ({{ g.cvr_change_pp }}){% endif %}</td>
+        <td class="r">{{ g.rate_effect_pp }}</td></tr>
+      {% endfor %}
+        <tr class="sub-total"><td></td><td colspan="5">구성 변화 {{ e.mix_pp }} · {{ e.dim }} 안 전환율 변화 {{ e.rate_pp }} · 교차 {{ e.inter_pp }}</td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+    <p class="note" style="margin-top:8px">전체 전환율 변화 = 구성 변화(세그먼트 비중이 바뀐 몫) + 세그먼트 안 전환율 변화 + 교차. 세 값의 합은 전체 변화와 같아요. 7일 세션 100개 미만은 전환율을 표시하지 않아요.</p>
+    {% else %}<p class="note">최근 14일 데이터가 모이면 표시돼요.</p>{% endif %}
   </div>
   <div class="visual">
     <h2>지표 상세 (지표 정의집 Tier 1·2)</h2>

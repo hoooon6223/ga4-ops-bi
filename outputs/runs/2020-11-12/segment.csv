@@ -1,0 +1,17 @@
+dim,val,w,days,sessions,order_sessions
+기기,desktop,cur,7,13010,181
+기기,desktop,prev,5,11500,97
+기기,mobile,cur,7,8924,140
+기기,mobile,prev,5,7963,55
+기기,tablet,cur,7,490,6
+기기,tablet,prev,5,439,3
+유입 매체,(none),cur,7,5194,73
+유입 매체,(none),prev,5,4532,35
+유입 매체,cpc,cur,7,927,9
+유입 매체,cpc,prev,5,848,5
+유입 매체,organic,cur,7,7396,92
+유입 매체,organic,prev,5,6701,29
+유입 매체,referral,cur,7,4153,77
+유입 매체,referral,prev,5,3601,40
+유입 매체,기타,cur,7,4754,76
+유입 매체,기타,prev,5,4220,46

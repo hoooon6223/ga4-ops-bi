@@ -73,11 +73,18 @@ main { padding: 12px 16px 72px; max-width: 1400px; }
 .ai ul { margin: 0 0 8px; padding-left: 18px; } .ai li { margin: 2px 0; }
 .ai h3 { font-size: 12px; color: var(--ink-2); margin: 8px 0 2px; font-weight: 600; }
 .ai .meta { font-size: 11px; color: var(--muted); margin-top: 8px; }
-.decomp { display: grid; gap: 6px; }
-.decomp div { display: grid; grid-template-columns: 1fr auto 56px; gap: 8px; border-bottom: 1px solid var(--grid); padding: 4px 0; }
-.decomp div span:last-child { text-align: right; }
-.decomp .decomp-head { color: var(--muted); font-size: 12px; }
-.decomp .op { color: var(--muted); text-align: center; border: 0; display: block; padding: 0; }
+.row-top { grid-template-columns: 1fr 1.6fr; }
+.today-list, .where-list { margin: 0; padding-left: 18px; line-height: 1.7; }
+.where-list li.muted { color: var(--muted); }
+.today-list { list-style: none; padding-left: 0; font-size: 15px; }
+.today .calm { font-size: 15px; margin: 4px 0; }
+.terms { font-weight: 600; margin: 0 0 6px; }
+.ok { color: var(--good); font-weight: 600; }
+.today-list .up { color: var(--up); } .today-list .down { color: var(--down); }
+.warn { color: var(--critical); font-weight: 600; }
+.info { color: var(--muted); font-size: 11px; }
+.ai-row { margin-top: 12px; }
+.sub-total td { color: var(--muted); font-size: 12px; }
 .num { font-variant-numeric: tabular-nums; }
 .chart { width: 100%; height: auto; display: block; }
 .chart .grid { stroke: var(--grid); stroke-width: 1; } .chart .axis { stroke: var(--axis); stroke-width: 1; }
@@ -122,7 +129,9 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
 <body>
 <header class="topbar">
   <h1>GA4 Merch Shop · 운영 KPI 리포트</h1>
-  <span class="sub">기준일 2020-12-03 (목) · 공개 샘플 데이터를 하루씩 리플레이</span>
+  <span class="sub">기준일 2020-12-03 (목) · 갱신 2026-11-20 16:27 KST ·
+    <span class="ok">숫자 검증 통과 ✓</span>
+    · 공개 샘플 데이터를 하루씩 리플레이</span>
 </header>
 
 <div class="slicers">
@@ -140,71 +149,107 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
 <!-- Page 1: overview -->
 <section class="page" id="overview">
   <h2 class="print-only">1. 개요</h2>
+  <div class="row2 row-top">
+    <div class="visual today">
+      <h2>오늘 볼 것</h2>
+      
+        <ul class="today-list">
+          <li><span class="up">▲</span>
+            <b>매출</b> 최근 7일 vs 직전 7일 <span class="num">+39.5%</span> <span class="flag">주목</span></li>
+        
+          <li><span class="up">▲</span>
+            <b>주문 수</b> 최근 7일 vs 직전 7일 <span class="num">+36.6%</span> <span class="flag">주목</span></li>
+        
+          <li><span class="up">▲</span>
+            <b>세션</b> 지난주 같은 요일 대비 <span class="num">+24.1%</span> <span class="flag">주목</span></li>
+        
+          <li><span class="up">▲</span>
+            <b>활성 사용자</b> 지난주 같은 요일 대비 <span class="num">+23.1%</span> <span class="flag">주목</span></li>
+        
+          <li><span class="up">▲</span>
+            <b>세션 전환율</b> 최근 7일 vs 직전 7일 <span class="num">+0.42%p</span> <span class="flag">주목</span></li>
+        </ul>
+      
+    </div>
+    <div class="visual">
+      <h2>어디서 변했나 <span class="funnel-meta">최근 7일 vs 직전 7일</span></h2>
+      
+        <p class="terms num">세션 +11.0% · 세션 전환율 +0.42%p (+26.7%) · 객단가 +1.7%</p>
+        <ul class="where-list"><li>매출 +39.5% (최근 7일 vs 직전 7일). 판정 기준을 넘은 항: 세션 전환율.</li><li>세션 전환율 1.57% → 1.99% (+0.42%p). 기준을 넘은 퍼널 단계: 결제 완료율 +7.49%p.</li><li>기기: 구성 변화 +0.00%p, 기기 안 전환율 변화 +0.42%p (데스크톱 +0.28%p, 모바일 +0.11%p).</li><li>유입 매체: 구성 변화 +0.00%p, 유입 매체 안 전환율 변화 +0.42%p (기타 +0.14%p, 외부 링크 +0.13%p).</li></ul>
+        <p class="note">무엇이 어디서 움직였는지까지만 보여줘요. 이유는 담당자가 확인해요.</p>
+      
+    </div>
+  </div>
+
   <div class="tiles">
     
-    <div class="visual tile">
-      <div class="label"><span>매출</span><span class="flag">주목</span></div>
+    <div class="visual tile" title="매출: 중복을 뺀 주문의 금액 합 (USD)">
+      <div class="label"><span>매출 <span class="info" aria-hidden="true">ⓘ</span></span><span class="flag">주목</span></div>
       <div class="value num">$4,277</div>
       <div class="delta up">
         ▲ +39.5%</div>
       <div class="basis">최근 7일 vs 직전 7일</div>
-      <div class="more">같은 요일 +3.5% · 전월 누적 +78.4%</div>
+      <div class="more">전일 -16.9% · 같은 요일 +3.5% · 최근 7일 +39.5%</div>
       <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,25.1 4.4,27.0 8.9,23.9 13.3,27.5 17.8,22.6 22.2,21.7 26.7,24.4 31.1,18.4 35.6,26.9 40.0,29.0 44.4,20.2 48.9,17.2 53.3,22.4 57.8,25.4 62.2,21.8 66.7,27.3 71.1,28.4 75.6,22.2 80.0,14.4 84.4,13.6 88.9,22.4 93.3,16.5 97.8,17.2 102.2,23.1 106.7,3.0 111.1,17.3 115.6,19.9 120.0,22.1" fill="none" class="spark-line"/><circle cx="120.0" cy="22.1" r="3" class="spark-dot"/></svg>
     </div>
     
-    <div class="visual tile">
-      <div class="label"><span>주문 수</span><span class="flag">주목</span></div>
+    <div class="visual tile" title="주문 수: 고유 주문 수. 같은 거래번호의 재전송은 1건">
+      <div class="label"><span>주문 수 <span class="info" aria-hidden="true">ⓘ</span></span><span class="flag">주목</span></div>
       <div class="value num">89</div>
       <div class="delta up">
         ▲ +36.6%</div>
       <div class="basis">최근 7일 vs 직전 7일</div>
-      <div class="more">같은 요일 +56.1% · 전월 누적 +160.4%</div>
+      <div class="more">전일 +9.9% · 같은 요일 +56.1% · 최근 7일 +36.6%</div>
       <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,22.6 4.4,27.2 8.9,26.8 13.3,23.1 17.8,19.5 22.2,19.5 26.7,21.7 31.1,16.4 35.6,27.0 40.0,29.0 44.4,18.4 48.9,12.0 53.3,20.6 57.8,23.5 62.2,19.3 66.7,25.9 71.1,26.8 75.6,17.8 80.0,9.8 84.4,11.8 88.9,21.1 93.3,12.9 97.8,16.4 102.2,22.4 106.7,3.0 111.1,10.3 115.6,15.8 120.0,14.0" fill="none" class="spark-line"/><circle cx="120.0" cy="14.0" r="3" class="spark-dot"/></svg>
     </div>
     
-    <div class="visual tile">
-      <div class="label"><span>세션</span><span class="flag">주목</span></div>
+    <div class="visual tile" title="세션: 그날 이벤트가 있는 세션 수 (사용자 ID + 세션 ID)">
+      <div class="label"><span>세션 <span class="info" aria-hidden="true">ⓘ</span></span><span class="flag">주목</span></div>
       <div class="value num">5,200</div>
       <div class="delta up">
         ▲ +24.1%</div>
       <div class="basis">지난주 같은 요일 대비</div>
-      <div class="more">같은 요일 +24.1% · 전월 누적 +28.2%</div>
+      <div class="more">전일 +8.0% · 같은 요일 +24.1% · 최근 7일 +11.0%</div>
       <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,19.0 4.4,28.0 8.9,29.0 13.3,19.5 17.8,14.7 22.2,14.8 26.7,15.9 31.1,18.9 35.6,27.3 40.0,28.6 44.4,17.2 48.9,12.6 53.3,12.2 57.8,11.6 62.2,12.1 66.7,20.2 71.1,24.5 75.6,13.6 80.0,9.5 84.4,8.0 88.9,11.7 93.3,13.4 97.8,18.5 102.2,19.6 106.7,8.2 111.1,4.7 115.6,6.3 120.0,3.0" fill="none" class="spark-line"/><circle cx="120.0" cy="3.0" r="3" class="spark-dot"/></svg>
     </div>
     
-    <div class="visual tile">
-      <div class="label"><span>활성 사용자</span><span class="flag">주목</span></div>
+    <div class="visual tile" title="활성 사용자: 그날 이벤트가 있는 고유 사용자 수">
+      <div class="label"><span>활성 사용자 <span class="info" aria-hidden="true">ⓘ</span></span><span class="flag">주목</span></div>
       <div class="value num">4,464</div>
       <div class="delta up">
         ▲ +23.1%</div>
       <div class="basis">지난주 같은 요일 대비</div>
-      <div class="more">같은 요일 +23.1% · 전월 누적 +25.3%</div>
+      <div class="more">전일 +8.9% · 같은 요일 +23.1% · 최근 7일 +12.0%</div>
       <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,19.9 4.4,28.1 8.9,29.0 13.3,19.9 17.8,15.3 22.2,14.9 26.7,16.1 31.1,19.4 35.6,27.4 40.0,28.6 44.4,17.1 48.9,13.4 53.3,12.8 57.8,12.2 62.2,13.1 66.7,20.5 71.1,24.5 75.6,13.7 80.0,9.6 84.4,7.9 88.9,11.6 93.3,12.7 97.8,17.9 102.2,19.1 106.7,8.0 111.1,4.6 115.6,6.7 120.0,3.0" fill="none" class="spark-line"/><circle cx="120.0" cy="3.0" r="3" class="spark-dot"/></svg>
     </div>
     
-    <div class="visual tile">
-      <div class="label"><span>세션 전환율</span><span class="flag">주목</span></div>
+    <div class="visual tile" title="세션 전환율: 주문이 1건 이상인 세션 ÷ 전체 세션">
+      <div class="label"><span>세션 전환율 <span class="info" aria-hidden="true">ⓘ</span></span><span class="flag">주목</span></div>
       <div class="value num">1.65%</div>
       <div class="delta up">
         ▲ +0.42%p</div>
       <div class="basis">최근 7일 vs 직전 7일</div>
-      <div class="more">같은 요일 +0.34%p · 전월 누적 +0.89%p</div>
+      <div class="more">전일 +0.10%p · 같은 요일 +0.34%p · 최근 7일 +0.42%p</div>
       <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,22.0 4.4,25.0 8.9,22.1 13.3,24.3 17.8,18.7 22.2,19.0 26.7,22.9 31.1,13.1 35.6,25.1 40.0,29.0 44.4,14.7 48.9,12.8 53.3,25.3 57.8,27.6 62.2,20.5 66.7,26.9 71.1,27.1 75.6,20.2 80.0,11.3 84.4,15.9 88.9,23.8 93.3,10.3 97.8,11.0 102.2,21.1 106.7,3.0 111.1,14.0 115.6,20.3 120.0,18.9" fill="none" class="spark-line"/><circle cx="120.0" cy="18.9" r="3" class="spark-dot"/></svg>
     </div>
     
-    <div class="visual tile">
-      <div class="label"><span>객단가</span></div>
+    <div class="visual tile" title="객단가: 매출 ÷ 매출값이 있는 주문 수">
+      <div class="label"><span>객단가 <span class="info" aria-hidden="true">ⓘ</span></span></div>
       <div class="value num">$49.73</div>
       <div class="delta up">
         ▲ +1.7%</div>
       <div class="basis">최근 7일 vs 직전 7일</div>
-      <div class="more">같은 요일 -35.0% · 전월 누적 -27.0%</div>
+      <div class="more">전일 -25.6% · 같은 요일 -35.0% · 최근 7일 +1.7%</div>
       <svg class="spark" viewBox="0 0 120 32" width="120" height="32" aria-hidden="true"><polyline points="0.0,22.6 4.4,15.9 8.9,3.0 13.3,29.0 17.8,21.4 22.2,19.2 26.7,22.2 31.1,17.9 35.6,16.4 40.0,19.1 44.4,18.1 48.9,21.6 53.3,18.7 57.8,18.9 62.2,14.6 66.7,20.8 71.1,23.2 75.6,22.4 80.0,19.4 84.4,15.4 88.9,16.9 93.3,18.4 97.8,12.2 102.2,16.1 106.7,12.3 111.1,21.2 115.6,20.4 120.0,26.7" fill="none" class="spark-line"/><circle cx="120.0" cy="26.7" r="3" class="spark-dot"/></svg>
     </div>
     
   </div>
 
-  <div class="row2">
+  <div class="row3">
+    <div class="visual"><h2>매출 · 최근 28일</h2><svg id="c-rev" class="chart" viewBox="0 0 560 200" role="img" aria-label="매출 최근 28일 추이" data-points='{"x": [52.0, 70.4, 88.7, 107.1, 125.5, 143.9, 162.2, 180.6, 199.0, 217.3, 235.7, 254.1, 272.4, 290.8, 309.2, 327.6, 345.9, 364.3, 382.7, 401.0, 419.4, 437.8, 456.1, 474.5, 492.9, 511.3, 529.6, 548.0], "dates": ["2020-11-06", "2020-11-07", "2020-11-08", "2020-11-09", "2020-11-10", "2020-11-11", "2020-11-12", "2020-11-13", "2020-11-14", "2020-11-15", "2020-11-16", "2020-11-17", "2020-11-18", "2020-11-19", "2020-11-20", "2020-11-21", "2020-11-22", "2020-11-23", "2020-11-24", "2020-11-25", "2020-11-26", "2020-11-27", "2020-11-28", "2020-11-29", "2020-11-30", "2020-12-01", "2020-12-02", "2020-12-03"], "labels": ["$3,038", "$2,298", "$3,556", "$2,078", "$4,041", "$4,428", "$3,349", "$5,750", "$2,338", "$1,483", "$5,046", "$6,227", "$4,153", "$2,915", "$4,396", "$2,168", "$1,714", "$4,241", "$7,382", "$7,674", "$4,133", "$6,523", "$6,255", "$3,862", "$11,956", "$6,203", "$5,144", "$4,277"], "y": [149.4, 155.4, 145.2, 157.2, 141.3, 138.1, 146.9, 127.4, 155.1, 162.0, 133.1, 123.6, 140.4, 150.4, 138.4, 156.4, 160.1, 139.6, 114.2, 111.8, 140.5, 121.2, 123.3, 142.7, 77.2, 123.8, 132.3, 139.4]}'><line x1="52" x2="548" y1="174.0" y2="174.0" class="axis"/><line x1="52" x2="548" y1="133.5" y2="133.5" class="grid"/><text x="46" y="137.5" class="tick" text-anchor="end">$5,000</text><line x1="52" x2="548" y1="93.0" y2="93.0" class="grid"/><text x="46" y="97.0" class="tick" text-anchor="end">$10,000</text><line x1="52" x2="548" y1="52.5" y2="52.5" class="grid"/><text x="46" y="56.5" class="tick" text-anchor="end">$15,000</text><line x1="52" x2="548" y1="12.0" y2="12.0" class="grid"/><text x="46" y="16.0" class="tick" text-anchor="end">$20,000</text><text x="162.2" y="194" class="tick" text-anchor="middle">11-12</text><text x="290.8" y="194" class="tick" text-anchor="middle">11-19</text><text x="419.4" y="194" class="tick" text-anchor="middle">11-26</text><text x="548.0" y="194" class="tick" text-anchor="middle">12-03</text><polyline points="52.0,149.4 70.4,155.4 88.7,145.2 107.1,157.2 125.5,141.3 143.9,138.1 162.2,146.9 180.6,127.4 199.0,155.1 217.3,162.0 235.7,133.1 254.1,123.6 272.4,140.4 290.8,150.4 309.2,138.4 327.6,156.4 345.9,160.1 364.3,139.6 382.7,114.2 401.0,111.8 419.4,140.5 437.8,121.2 456.1,123.3 474.5,142.7 492.9,77.2 511.3,123.8 529.6,132.3 548.0,139.4" fill="none" class="series"/><line class="xhair" y1="12" y2="174" x1="-10" x2="-10"/><circle class="xdot" r="4" cx="-10" cy="-10"/><rect class="hit" x="52" y="0" width="496" height="200" fill="transparent"/></svg></div>
+    <div class="visual"><h2>세션 · 최근 28일</h2><svg id="c-ses" class="chart" viewBox="0 0 560 200" role="img" aria-label="세션 최근 28일 추이" data-points='{"x": [52.0, 70.4, 88.7, 107.1, 125.5, 143.9, 162.2, 180.6, 199.0, 217.3, 235.7, 254.1, 272.4, 290.8, 309.2, 327.6, 345.9, 364.3, 382.7, 401.0, 419.4, 437.8, 456.1, 474.5, 492.9, 511.3, 529.6, 548.0], "dates": ["2020-11-06", "2020-11-07", "2020-11-08", "2020-11-09", "2020-11-10", "2020-11-11", "2020-11-12", "2020-11-13", "2020-11-14", "2020-11-15", "2020-11-16", "2020-11-17", "2020-11-18", "2020-11-19", "2020-11-20", "2020-11-21", "2020-11-22", "2020-11-23", "2020-11-24", "2020-11-25", "2020-11-26", "2020-11-27", "2020-11-28", "2020-11-29", "2020-11-30", "2020-12-01", "2020-12-02", "2020-12-03"], "labels": ["3,332", "2,283", "2,170", "3,282", "3,835", "3,820", "3,702", "3,347", "2,369", "2,214", "3,541", "4,079", "4,133", "4,197", "4,141", "3,198", "2,689", "3,968", "4,441", "4,619", "4,190", "3,985", "3,396", "3,262", "4,593", "5,000", "4,814", "5,200"], "y": [106.5, 127.8, 130.1, 107.5, 96.3, 96.6, 99.0, 106.2, 126.0, 129.2, 102.3, 91.4, 90.3, 89.0, 90.1, 109.2, 119.5, 93.6, 84.1, 80.5, 89.2, 93.3, 105.2, 107.9, 81.0, 72.8, 76.5, 68.7]}'><line x1="52" x2="548" y1="174.0" y2="174.0" class="axis"/><line x1="52" x2="548" y1="133.5" y2="133.5" class="grid"/><text x="46" y="137.5" class="tick" text-anchor="end">2,000</text><line x1="52" x2="548" y1="93.0" y2="93.0" class="grid"/><text x="46" y="97.0" class="tick" text-anchor="end">4,000</text><line x1="52" x2="548" y1="52.5" y2="52.5" class="grid"/><text x="46" y="56.5" class="tick" text-anchor="end">6,000</text><line x1="52" x2="548" y1="12.0" y2="12.0" class="grid"/><text x="46" y="16.0" class="tick" text-anchor="end">8,000</text><text x="162.2" y="194" class="tick" text-anchor="middle">11-12</text><text x="290.8" y="194" class="tick" text-anchor="middle">11-19</text><text x="419.4" y="194" class="tick" text-anchor="middle">11-26</text><text x="548.0" y="194" class="tick" text-anchor="middle">12-03</text><polyline points="52.0,106.5 70.4,127.8 88.7,130.1 107.1,107.5 125.5,96.3 143.9,96.6 162.2,99.0 180.6,106.2 199.0,126.0 217.3,129.2 235.7,102.3 254.1,91.4 272.4,90.3 290.8,89.0 309.2,90.1 327.6,109.2 345.9,119.5 364.3,93.6 382.7,84.1 401.0,80.5 419.4,89.2 437.8,93.3 456.1,105.2 474.5,107.9 492.9,81.0 511.3,72.8 529.6,76.5 548.0,68.7" fill="none" class="series"/><line class="xhair" y1="12" y2="174" x1="-10" x2="-10"/><circle class="xdot" r="4" cx="-10" cy="-10"/><rect class="hit" x="52" y="0" width="496" height="200" fill="transparent"/></svg></div>
+  </div>
+  <div class="ai-row">
     <div class="visual ai">
       <h2>AI 일일 코멘트</h2>
       
@@ -214,40 +259,6 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
         <p class="meta">claude-opus-5-5가 작성했어요. 문장 속 숫자는 모두 SQL 집계 결과에서 채워 넣었어요.</p>
       
     </div>
-    <div class="visual">
-      <h2>매출 분해 (최근 7일, 직전 7일 대비)</h2>
-      
-      <div class="decomp">
-        <div class="decomp-head"><span>항</span><span>값 (변화)</span><span>기여도</span></div>
-        
-          
-          <div><span>세션</span><span class="num">30,250 <span class="funnel-meta">(+11.0%)</span></span><span class="num">31%</span></div>
-        
-          <span class="op">×</span>
-          <div><span>세션 전환율</span><span class="num">1.99% <span class="funnel-meta">(+26.7%)</span></span><span class="num">71%</span></div>
-        
-          <span class="op">×</span>
-          <div><span>세션당 주문 수</span><span class="num">1.06 <span class="funnel-meta">(-2.9%)</span></span><span class="num">-9%</span></div>
-        
-          <span class="op">×</span>
-          <div><span>매출 기록 비율</span><span class="num">94.4% <span class="funnel-meta">(+0.4%)</span></span><span class="num">1%</span></div>
-        
-          <span class="op">×</span>
-          <div><span>객단가</span><span class="num">$73.46 <span class="funnel-meta">(+1.7%)</span></span><span class="num">5%</span></div>
-        
-          <span class="op">=</span>
-          <div><span>매출 (7일 합)</span><span class="num">$44,220 <span class="funnel-meta">(+39.5%)</span></span><span class="num">100%</span></div>
-        
-      </div>
-      <p class="note" style="margin-top:8px">다섯 항을 곱하면 매출과 정확히 같아요. 기여도는 매출 변화를 항별로 나눈 값이에요 (로그 분해, 합 100%).
-        정합성 체크(R6): 통과.</p>
-      
-    </div>
-  </div>
-
-  <div class="row3">
-    <div class="visual"><h2>매출 · 최근 28일</h2><svg id="c-rev" class="chart" viewBox="0 0 560 200" role="img" aria-label="매출 최근 28일 추이" data-points='{"x": [52.0, 70.4, 88.7, 107.1, 125.5, 143.9, 162.2, 180.6, 199.0, 217.3, 235.7, 254.1, 272.4, 290.8, 309.2, 327.6, 345.9, 364.3, 382.7, 401.0, 419.4, 437.8, 456.1, 474.5, 492.9, 511.3, 529.6, 548.0], "dates": ["2020-11-06", "2020-11-07", "2020-11-08", "2020-11-09", "2020-11-10", "2020-11-11", "2020-11-12", "2020-11-13", "2020-11-14", "2020-11-15", "2020-11-16", "2020-11-17", "2020-11-18", "2020-11-19", "2020-11-20", "2020-11-21", "2020-11-22", "2020-11-23", "2020-11-24", "2020-11-25", "2020-11-26", "2020-11-27", "2020-11-28", "2020-11-29", "2020-11-30", "2020-12-01", "2020-12-02", "2020-12-03"], "labels": ["$3,038", "$2,298", "$3,556", "$2,078", "$4,041", "$4,428", "$3,349", "$5,750", "$2,338", "$1,483", "$5,046", "$6,227", "$4,153", "$2,915", "$4,396", "$2,168", "$1,714", "$4,241", "$7,382", "$7,674", "$4,133", "$6,523", "$6,255", "$3,862", "$11,956", "$6,203", "$5,144", "$4,277"], "y": [149.4, 155.4, 145.2, 157.2, 141.3, 138.1, 146.9, 127.4, 155.1, 162.0, 133.1, 123.6, 140.4, 150.4, 138.4, 156.4, 160.1, 139.6, 114.2, 111.8, 140.5, 121.2, 123.3, 142.7, 77.2, 123.8, 132.3, 139.4]}'><line x1="52" x2="548" y1="174.0" y2="174.0" class="axis"/><line x1="52" x2="548" y1="133.5" y2="133.5" class="grid"/><text x="46" y="137.5" class="tick" text-anchor="end">$5,000</text><line x1="52" x2="548" y1="93.0" y2="93.0" class="grid"/><text x="46" y="97.0" class="tick" text-anchor="end">$10,000</text><line x1="52" x2="548" y1="52.5" y2="52.5" class="grid"/><text x="46" y="56.5" class="tick" text-anchor="end">$15,000</text><line x1="52" x2="548" y1="12.0" y2="12.0" class="grid"/><text x="46" y="16.0" class="tick" text-anchor="end">$20,000</text><text x="162.2" y="194" class="tick" text-anchor="middle">11-12</text><text x="290.8" y="194" class="tick" text-anchor="middle">11-19</text><text x="419.4" y="194" class="tick" text-anchor="middle">11-26</text><text x="548.0" y="194" class="tick" text-anchor="middle">12-03</text><polyline points="52.0,149.4 70.4,155.4 88.7,145.2 107.1,157.2 125.5,141.3 143.9,138.1 162.2,146.9 180.6,127.4 199.0,155.1 217.3,162.0 235.7,133.1 254.1,123.6 272.4,140.4 290.8,150.4 309.2,138.4 327.6,156.4 345.9,160.1 364.3,139.6 382.7,114.2 401.0,111.8 419.4,140.5 437.8,121.2 456.1,123.3 474.5,142.7 492.9,77.2 511.3,123.8 529.6,132.3 548.0,139.4" fill="none" class="series"/><line class="xhair" y1="12" y2="174" x1="-10" x2="-10"/><circle class="xdot" r="4" cx="-10" cy="-10"/><rect class="hit" x="52" y="0" width="496" height="200" fill="transparent"/></svg></div>
-    <div class="visual"><h2>세션 · 최근 28일</h2><svg id="c-ses" class="chart" viewBox="0 0 560 200" role="img" aria-label="세션 최근 28일 추이" data-points='{"x": [52.0, 70.4, 88.7, 107.1, 125.5, 143.9, 162.2, 180.6, 199.0, 217.3, 235.7, 254.1, 272.4, 290.8, 309.2, 327.6, 345.9, 364.3, 382.7, 401.0, 419.4, 437.8, 456.1, 474.5, 492.9, 511.3, 529.6, 548.0], "dates": ["2020-11-06", "2020-11-07", "2020-11-08", "2020-11-09", "2020-11-10", "2020-11-11", "2020-11-12", "2020-11-13", "2020-11-14", "2020-11-15", "2020-11-16", "2020-11-17", "2020-11-18", "2020-11-19", "2020-11-20", "2020-11-21", "2020-11-22", "2020-11-23", "2020-11-24", "2020-11-25", "2020-11-26", "2020-11-27", "2020-11-28", "2020-11-29", "2020-11-30", "2020-12-01", "2020-12-02", "2020-12-03"], "labels": ["3,332", "2,283", "2,170", "3,282", "3,835", "3,820", "3,702", "3,347", "2,369", "2,214", "3,541", "4,079", "4,133", "4,197", "4,141", "3,198", "2,689", "3,968", "4,441", "4,619", "4,190", "3,985", "3,396", "3,262", "4,593", "5,000", "4,814", "5,200"], "y": [106.5, 127.8, 130.1, 107.5, 96.3, 96.6, 99.0, 106.2, 126.0, 129.2, 102.3, 91.4, 90.3, 89.0, 90.1, 109.2, 119.5, 93.6, 84.1, 80.5, 89.2, 93.3, 105.2, 107.9, 81.0, 72.8, 76.5, 68.7]}'><line x1="52" x2="548" y1="174.0" y2="174.0" class="axis"/><line x1="52" x2="548" y1="133.5" y2="133.5" class="grid"/><text x="46" y="137.5" class="tick" text-anchor="end">2,000</text><line x1="52" x2="548" y1="93.0" y2="93.0" class="grid"/><text x="46" y="97.0" class="tick" text-anchor="end">4,000</text><line x1="52" x2="548" y1="52.5" y2="52.5" class="grid"/><text x="46" y="56.5" class="tick" text-anchor="end">6,000</text><line x1="52" x2="548" y1="12.0" y2="12.0" class="grid"/><text x="46" y="16.0" class="tick" text-anchor="end">8,000</text><text x="162.2" y="194" class="tick" text-anchor="middle">11-12</text><text x="290.8" y="194" class="tick" text-anchor="middle">11-19</text><text x="419.4" y="194" class="tick" text-anchor="middle">11-26</text><text x="548.0" y="194" class="tick" text-anchor="middle">12-03</text><polyline points="52.0,106.5 70.4,127.8 88.7,130.1 107.1,107.5 125.5,96.3 143.9,96.6 162.2,99.0 180.6,106.2 199.0,126.0 217.3,129.2 235.7,102.3 254.1,91.4 272.4,90.3 290.8,89.0 309.2,90.1 327.6,109.2 345.9,119.5 364.3,93.6 382.7,84.1 401.0,80.5 419.4,89.2 437.8,93.3 456.1,105.2 474.5,107.9 492.9,81.0 511.3,72.8 529.6,76.5 548.0,68.7" fill="none" class="series"/><line class="xhair" y1="12" y2="174" x1="-10" x2="-10"/><circle class="xdot" r="4" cx="-10" cy="-10"/><rect class="hit" x="52" y="0" width="496" height="200" fill="transparent"/></svg></div>
   </div>
 </section>
 
@@ -283,6 +294,60 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
     </div>
     
     <p class="note num" style="margin-top:8px">참고: 상품 조회 세션 중 장바구니에 담은 비율 34.8%</p>
+  </div>
+  <div class="visual">
+    <h2>세그먼트별 세션 전환율 (최근 7일 vs 직전 7일)</h2>
+    
+    <div class="table-wrap"><table>
+      <thead><tr><th>구분</th><th>세그먼트</th><th class="r">세션</th><th class="r">비중 (변화)</th><th class="r">전환율 (변화)</th><th class="r">전체 전환율 변화 중 몫</th></tr></thead>
+      <tbody>
+        <tr><td>기기</td><td>데스크톱</td><td class="r">17,659</td>
+        <td class="r">58.4% (+0.3%p)</td>
+        <td class="r">1.95% (+0.49%p)</td>
+        <td class="r">+0.28%p</td></tr>
+      
+        <tr><td></td><td>모바일</td><td class="r">11,916</td>
+        <td class="r">39.4% (-0.4%p)</td>
+        <td class="r">2.01% (+0.29%p)</td>
+        <td class="r">+0.11%p</td></tr>
+      
+        <tr><td></td><td>태블릿</td><td class="r">675</td>
+        <td class="r">2.2% (+0.1%p)</td>
+        <td class="r">2.52% (+0.99%p)</td>
+        <td class="r">+0.02%p</td></tr>
+      
+        <tr class="sub-total"><td></td><td colspan="5">구성 변화 +0.00%p · 기기 안 전환율 변화 +0.42%p · 교차 +0.00%p</td></tr>
+      
+        <tr><td>유입 매체</td><td>자연 검색</td><td class="r">10,256</td>
+        <td class="r">33.9% (+0.4%p)</td>
+        <td class="r">1.55% (+0.13%p)</td>
+        <td class="r">+0.04%p</td></tr>
+      
+        <tr><td></td><td>직접 방문</td><td class="r">6,895</td>
+        <td class="r">22.8% (-0.5%p)</td>
+        <td class="r">1.78% (+0.41%p)</td>
+        <td class="r">+0.10%p</td></tr>
+      
+        <tr><td></td><td>기타</td><td class="r">6,310</td>
+        <td class="r">20.9% (-0.2%p)</td>
+        <td class="r">2.50% (+0.64%p)</td>
+        <td class="r">+0.14%p</td></tr>
+      
+        <tr><td></td><td>외부 링크</td><td class="r">5,466</td>
+        <td class="r">18.1% (-0.1%p)</td>
+        <td class="r">2.52% (+0.73%p)</td>
+        <td class="r">+0.13%p</td></tr>
+      
+        <tr><td></td><td>검색 광고</td><td class="r">1,323</td>
+        <td class="r">4.4% (+0.4%p)</td>
+        <td class="r">1.81% (+0.43%p)</td>
+        <td class="r">+0.02%p</td></tr>
+      
+        <tr class="sub-total"><td></td><td colspan="5">구성 변화 +0.00%p · 유입 매체 안 전환율 변화 +0.42%p · 교차 +0.00%p</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note" style="margin-top:8px">전체 전환율 변화 = 구성 변화(세그먼트 비중이 바뀐 몫) + 세그먼트 안 전환율 변화 + 교차. 세 값의 합은 전체 변화와 같아요. 7일 세션 100개 미만은 전환율을 표시하지 않아요.</p>
+    
   </div>
   <div class="visual">
     <h2>지표 상세 (지표 정의집 Tier 1·2)</h2>
@@ -402,7 +467,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
     <p class="note" style="margin-top:8px">DQ는 데이터 품질 체크, R은 같은 숫자를 다른 단위로 계산해 맞춰보는 대사 규칙이에요. 하나라도 실패하면 그날 리포트는 해석 보류로 표시돼요.</p>
   </div>
 </section>
-<footer>생성 2026-11-20 05:43 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
+<footer>생성 2026-11-20 16:27 KST · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
 </main>
 
 <nav class="tabs">

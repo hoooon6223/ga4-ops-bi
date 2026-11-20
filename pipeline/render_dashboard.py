@@ -11,7 +11,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from pipeline import ai_summary, fmt
+from pipeline import ai_summary, drilldown, fmt
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
@@ -25,7 +25,16 @@ TILES = [  # metric_id, label, how to compute the 28-day sparkline from kpi_dail
     ("K05_session_cvr", "세션 전환율", lambda r: ratio(r["order_sessions"], r["sessions"])),
     ("K06_aov", "객단가", lambda r: ratio(r["revenue"], r["orders_with_revenue"])),
 ]
-BASIS = {"day_wow": "지난주 같은 요일 대비", "r7_wow": "최근 7일 vs 직전 7일"}
+BASIS = drilldown.BASIS
+# Shown when hovering a KPI card: what is counted (docs/ops_bi/02_ops_metric_definitions.md).
+DEFINITION = {
+    "K01_revenue": "중복을 뺀 주문의 금액 합 (USD)",
+    "K02_orders": "고유 주문 수. 같은 거래번호의 재전송은 1건",
+    "K03_sessions": "그날 이벤트가 있는 세션 수 (사용자 ID + 세션 ID)",
+    "K04_active_users": "그날 이벤트가 있는 고유 사용자 수",
+    "K05_session_cvr": "주문이 1건 이상인 세션 ÷ 전체 세션",
+    "K06_aov": "매출 ÷ 매출값이 있는 주문 수",
+}
 DQ_BADGE = {"PASS": ("good", "✓", "통과"), "WARN": ("warning", "!", "경고"),
             "FAIL": ("critical", "✕", "실패"), "SKIP": ("muted", "–", "건너뜀")}
 
@@ -42,39 +51,6 @@ def ratio(a, b):
 def read(path):
     with open(path, newline="") as fh:
         return list(csv.DictReader(fh))
-
-
-# Revenue = sessions x session CVR x orders per order-session x revenue coverage x AOV.
-# The two middle terms make the product exact: CVR counts sessions (not orders) and AOV
-# counts only orders with a revenue value. Shares split the log change, so they add up to 100%.
-FACTORS = [
-    ("세션", lambda t: t["sessions"], lambda v: f"{v:,.0f}"),
-    ("세션 전환율", lambda t: t["order_sessions"] / t["sessions"], lambda v: f"{v * 100:.2f}%"),
-    ("세션당 주문 수", lambda t: t["orders"] / t["order_sessions"], lambda v: f"{v:.2f}"),
-    ("매출 기록 비율", lambda t: t["orders_with_revenue"] / t["orders"], lambda v: f"{v * 100:.1f}%"),
-    ("객단가", lambda t: t["revenue"] / t["orders_with_revenue"], lambda v: f"${v:,.2f}"),
-]
-
-
-def window_sums(days):
-    keys = ["sessions", "order_sessions", "orders", "orders_with_revenue", "revenue"]
-    return {k: sum(f(d[k]) or 0 for d in days) for k in keys}
-
-
-def decompose(cur_days, prev_days):
-    """Factors of the last 7 days vs the 7 before; empty if a factor cannot be computed."""
-    cur, prev = window_sums(cur_days), window_sums(prev_days)
-    if any(v <= 0 for v in [*cur.values(), *prev.values()]):
-        return []
-    total = math.log(cur["revenue"] / prev["revenue"])
-    rows = []
-    for label, calc, show in FACTORS:
-        c, p = calc(cur), calc(prev)
-        rows.append({"label": label, "value": show(c), "change": f"{c / p - 1:+.1%}",
-                     "share": f"{math.log(c / p) / total:.0%}" if abs(total) > 1e-9 else "–"})
-    rows.append({"label": "매출 (7일 합)", "value": f"${cur['revenue']:,.0f}",
-                 "change": f"{cur['revenue'] / prev['revenue'] - 1:+.1%}", "share": "100%"})
-    return rows
 
 
 def sparkline(values, w=120, h=32):
@@ -137,7 +113,10 @@ def render(run_dir):
             "delta": fmt.change(r["unit"], r["flag_change"]),
             "delta_sign": (f(r["flag_change"]) or 0),
             "basis": BASIS[r["flag_basis"]],
+            "dod": fmt.change(r["unit"], r["dod_change"]),
             "wow": fmt.change(r["unit"], r["wow_day_change"]),
+            "r7": fmt.change(r["unit"], r["r7_change"]),
+            "definition": DEFINITION[mid],
             "mom": fmt.change(r["unit"], r["mom_change"]),
             "notable": r["flag"] == "notable",
             "spark": sparkline([series(t) for t in trend]),
@@ -153,7 +132,17 @@ def render(run_dir):
                "step": "" if i == 0 or not steps[i - 1][1] else f"이전 단계 대비 {v / steps[i - 1][1] * 100:.1f}%"}
               for i, (n, v) in enumerate(steps)]
 
-    decomposition = decompose(trend[-7:], trend[-14:-7]) if len(trend) >= 14 else []
+    segment_rows = read(run_dir / "segment.csv") if (run_dir / "segment.csv").exists() else []
+    today = drilldown.today_items(comparison.values())
+    if len(trend) >= 14:
+        cur, prev = drilldown.window_sums(trend[-7:]), drilldown.window_sums(trend[-14:-7])
+        where, segments = drilldown.where_lines(trend[-7:], trend[-14:-7], segment_rows)
+        terms = drilldown.three_terms(cur, prev) if where else []
+    else:
+        where, segments, terms = [], [], []
+    # Header trust line: calculation checks (R*) and data arrival only; quality warnings stay on their tab.
+    blocking = [r for r in dq if (r["check_id"].startswith("R") or r["check_id"].startswith("DQ01"))
+                and r["status"] == "FAIL"]
 
     detail = [{"name": r["metric_name"], "tier": r["tier"], "day": fmt.value(r["metric_id"], r["unit"], r["value_day"]),
                "dod": fmt.change(r["unit"], r["dod_change"]), "wow": fmt.change(r["unit"], r["wow_day_change"]),
@@ -181,10 +170,10 @@ def render(run_dir):
         day=day, weekday="월화수목금토일"[d.weekday()], days=days,
         tiles=tiles, funnel=funnel,
         cart_rate=f"{cart_rate:.1f}%",
-        decomposition=decomposition, decomp_check=next(({"label": DQ_BADGE[r["status"]][2]} for r in dq if r["check_id"].startswith("R6")), None),
+        today=today, where=where, terms=terms, segments=segments, verified=not blocking,
         detail=detail, charts=charts, ai=ai,
         dq=[{**r, "badge": DQ_BADGE[r["status"]]} for r in dq],
-        generated=dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        generated=dt.datetime.now(dt.timezone(dt.timedelta(hours=9))).strftime("%Y-%m-%d %H:%M KST"),
     )
     (SITE / "days").mkdir(parents=True, exist_ok=True)
     page = SITE / "days" / f"{day}.html"

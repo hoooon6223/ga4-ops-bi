@@ -27,6 +27,16 @@ EXPORTS = {
     "dq_results.csv": f"SELECT * EXCEPT(loaded_at) FROM {DS}.ops_dq_results` WHERE dq_date = @run_date ORDER BY check_id",
     "trend.csv": f"SELECT * EXCEPT(loaded_at) FROM {DS}.ops_kpi_daily` "
                  "WHERE kpi_date BETWEEN DATE_SUB(@run_date, INTERVAL 27 DAY) AND @run_date ORDER BY kpi_date",
+    # Segments for the "where did it change" box: last 7 days (cur) vs the 7 before (prev).
+    # Obfuscated mediums (<Other>, (data deleted)) and small ones are grouped as 기타.
+    "segment.csv": f"""
+        SELECT dim, val, IF(session_date > DATE_SUB(@run_date, INTERVAL 7 DAY), 'cur', 'prev') AS w,
+          COUNT(DISTINCT session_date) AS days, COUNT(*) AS sessions, COUNTIF(orders > 0) AS order_sessions
+        FROM {DS}.ops_f_sessions`,
+          UNNEST([STRUCT('기기' AS dim, IFNULL(device_category, '기타') AS val),
+                  ('유입 매체', IF(medium IN ('organic', '(none)', 'referral', 'cpc'), medium, '기타'))])
+        WHERE session_date BETWEEN DATE_SUB(@run_date, INTERVAL 13 DAY) AND @run_date
+        GROUP BY dim, val, w ORDER BY dim, val, w""",
 }
 
 
