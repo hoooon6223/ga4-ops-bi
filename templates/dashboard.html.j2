@@ -56,13 +56,19 @@
     </div>
     <div class="visual">
       <h2>매출 분해 (최근 7일, 직전 7일 대비)</h2>
+      {% if decomposition %}
       <div class="decomp">
+        <div class="decomp-head"><span>항</span><span>값 (변화)</span><span>기여도</span></div>
         {% for d in decomposition %}
-          {% if loop.index == 2 or loop.index == 3 %}<span class="op">×</span>{% elif loop.index == 4 %}<span class="op">≈</span>{% endif %}
-          <div><span>{{ d.label }}</span><span class="num">{{ d.value }} <span class="funnel-meta">({{ d.change }})</span></span></div>
+          {% if loop.last %}<span class="op">=</span>{% elif not loop.first %}<span class="op">×</span>{% endif %}
+          <div><span>{{ d.label }}</span><span class="num">{{ d.value }} <span class="funnel-meta">({{ d.change }})</span></span><span class="num">{{ d.share }}</span></div>
         {% endfor %}
       </div>
-      <p class="note" style="margin-top:8px">한 세션에 주문이 여러 건인 경우가 있어 근사식이에요.</p>
+      <p class="note" style="margin-top:8px">다섯 항을 곱하면 매출과 정확히 같아요. 기여도는 매출 변화를 항별로 나눈 값이에요 (로그 분해, 합 100%).
+        {% if decomp_check %}정합성 체크(R6): {{ decomp_check.label }}.{% endif %}</p>
+      {% else %}
+      <p class="note">최근 14일 데이터가 모이면 표시돼요.</p>
+      {% endif %}
     </div>
   </div>
 

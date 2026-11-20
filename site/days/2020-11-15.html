@@ -74,7 +74,9 @@ main { padding: 12px 16px 72px; max-width: 1400px; }
 .ai h3 { font-size: 12px; color: var(--ink-2); margin: 8px 0 2px; font-weight: 600; }
 .ai .meta { font-size: 11px; color: var(--muted); margin-top: 8px; }
 .decomp { display: grid; gap: 6px; }
-.decomp div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--grid); padding: 4px 0; }
+.decomp div { display: grid; grid-template-columns: 1fr auto 56px; gap: 8px; border-bottom: 1px solid var(--grid); padding: 4px 0; }
+.decomp div span:last-child { text-align: right; }
+.decomp .decomp-head { color: var(--muted); font-size: 12px; }
 .decomp .op { color: var(--muted); text-align: center; border: 0; display: block; padding: 0; }
 .num { font-variant-numeric: tabular-nums; }
 .chart { width: 100%; height: auto; display: block; }
@@ -127,7 +129,7 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
   <div class="slicer">
     <label for="day">날짜</label>
     <select id="day">
-      <option value="2020-11-28" >2020-11-28</option><option value="2020-11-27" >2020-11-27</option><option value="2020-11-26" >2020-11-26</option><option value="2020-11-25" >2020-11-25</option><option value="2020-11-24" >2020-11-24</option><option value="2020-11-23" >2020-11-23</option><option value="2020-11-22" >2020-11-22</option><option value="2020-11-21" >2020-11-21</option><option value="2020-11-20" >2020-11-20</option><option value="2020-11-19" >2020-11-19</option><option value="2020-11-18" >2020-11-18</option><option value="2020-11-17" >2020-11-17</option><option value="2020-11-16" >2020-11-16</option><option value="2020-11-15" selected>2020-11-15</option><option value="2020-11-14" >2020-11-14</option><option value="2020-11-13" >2020-11-13</option><option value="2020-11-12" >2020-11-12</option><option value="2020-11-11" >2020-11-11</option><option value="2020-11-10" >2020-11-10</option><option value="2020-11-09" >2020-11-09</option><option value="2020-11-08" >2020-11-08</option><option value="2020-11-07" >2020-11-07</option><option value="2020-11-06" >2020-11-06</option><option value="2020-11-05" >2020-11-05</option><option value="2020-11-04" >2020-11-04</option><option value="2020-11-03" >2020-11-03</option><option value="2020-11-02" >2020-11-02</option><option value="2020-11-01" >2020-11-01</option>
+      <option value="2020-12-13" >2020-12-13</option><option value="2020-12-12" >2020-12-12</option><option value="2020-12-11" >2020-12-11</option><option value="2020-12-10" >2020-12-10</option><option value="2020-12-09" >2020-12-09</option><option value="2020-12-08" >2020-12-08</option><option value="2020-12-07" >2020-12-07</option><option value="2020-12-06" >2020-12-06</option><option value="2020-12-05" >2020-12-05</option><option value="2020-12-04" >2020-12-04</option><option value="2020-12-03" >2020-12-03</option><option value="2020-12-02" >2020-12-02</option><option value="2020-12-01" >2020-12-01</option><option value="2020-11-30" >2020-11-30</option><option value="2020-11-29" >2020-11-29</option><option value="2020-11-28" >2020-11-28</option><option value="2020-11-27" >2020-11-27</option><option value="2020-11-26" >2020-11-26</option><option value="2020-11-25" >2020-11-25</option><option value="2020-11-24" >2020-11-24</option><option value="2020-11-23" >2020-11-23</option><option value="2020-11-22" >2020-11-22</option><option value="2020-11-21" >2020-11-21</option><option value="2020-11-20" >2020-11-20</option><option value="2020-11-19" >2020-11-19</option><option value="2020-11-18" >2020-11-18</option><option value="2020-11-17" >2020-11-17</option><option value="2020-11-16" >2020-11-16</option><option value="2020-11-15" selected>2020-11-15</option><option value="2020-11-14" >2020-11-14</option><option value="2020-11-13" >2020-11-13</option><option value="2020-11-12" >2020-11-12</option><option value="2020-11-11" >2020-11-11</option><option value="2020-11-10" >2020-11-10</option><option value="2020-11-09" >2020-11-09</option><option value="2020-11-08" >2020-11-08</option><option value="2020-11-07" >2020-11-07</option><option value="2020-11-06" >2020-11-06</option><option value="2020-11-05" >2020-11-05</option><option value="2020-11-04" >2020-11-04</option><option value="2020-11-03" >2020-11-03</option><option value="2020-11-02" >2020-11-02</option><option value="2020-11-01" >2020-11-01</option>
     </select>
   </div>
   <a class="pill screen-only" href="../reports.html" style="color:inherit;text-decoration:none">일별 리포트 목록</a>
@@ -212,22 +214,32 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
     </div>
     <div class="visual">
       <h2>매출 분해 (최근 7일, 직전 7일 대비)</h2>
+      
       <div class="decomp">
+        <div class="decomp-head"><span>항</span><span>값 (변화)</span><span>기여도</span></div>
         
           
-          <div><span>세션 (7일 합)</span><span class="num">22,569 <span class="funnel-meta">(-9.9%)</span></span></div>
+          <div><span>세션</span><span class="num">22,569 <span class="funnel-meta">(-9.9%)</span></span><span class="num">-80%</span></div>
         
           <span class="op">×</span>
-          <div><span>세션 전환율</span><span class="num">1.50% <span class="funnel-meta">(+0.51%p)</span></span></div>
+          <div><span>세션 전환율</span><span class="num">1.50% <span class="funnel-meta">(+51.2%)</span></span><span class="num">316%</span></div>
         
           <span class="op">×</span>
-          <div><span>객단가</span><span class="num">$65.73 <span class="funnel-meta">(-17.0%)</span></span></div>
+          <div><span>세션당 주문 수</span><span class="num">1.06 <span class="funnel-meta">(+1.4%)</span></span><span class="num">11%</span></div>
         
-          <span class="op">≈</span>
-          <div><span>매출 (7일 합)</span><span class="num">$23,467 <span class="funnel-meta">(+14.0%)</span></span></div>
+          <span class="op">×</span>
+          <div><span>매출 기록 비율</span><span class="num">99.4% <span class="funnel-meta">(-0.6%)</span></span><span class="num">-4%</span></div>
+        
+          <span class="op">×</span>
+          <div><span>객단가</span><span class="num">$65.73 <span class="funnel-meta">(-17.0%)</span></span><span class="num">-143%</span></div>
+        
+          <span class="op">=</span>
+          <div><span>매출 (7일 합)</span><span class="num">$23,467 <span class="funnel-meta">(+14.0%)</span></span><span class="num">100%</span></div>
         
       </div>
-      <p class="note" style="margin-top:8px">한 세션에 주문이 여러 건인 경우가 있어 근사식이에요.</p>
+      <p class="note" style="margin-top:8px">다섯 항을 곱하면 매출과 정확히 같아요. 기여도는 매출 변화를 항별로 나눈 값이에요 (로그 분해, 합 100%).
+        정합성 체크(R6): 통과.</p>
+      
     </div>
   </div>
 
@@ -379,12 +391,16 @@ footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
         <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
         <td>중복 제거 매출 &lt;= 원본 매출<br><span class="funnel-meta">R5_dedup_revenue</span></td>
         <td class="funnel-meta">&lt;= 1483.00</td><td class="funnel-meta">revenue=1483.00, raw_revenue=1483.00</td></tr>
+      
+        <tr><td><span class="pill"><span class="dot good">✓</span>통과</span></td>
+        <td>매출 분해 = 매출 (최근 7일, 5개 항의 곱)<br><span class="funnel-meta">R6_revenue_decomposition</span></td>
+        <td class="funnel-meta">|diff| &lt; 0.001</td><td class="funnel-meta">product=23467.00, revenue_r7=23467.00</td></tr>
       </tbody>
     </table></div>
     <p class="note" style="margin-top:8px">DQ는 데이터 품질 체크, R은 같은 숫자를 다른 단위로 계산해 맞춰보는 대사 규칙이에요. 하나라도 실패하면 그날 리포트는 해석 보류로 표시돼요.</p>
   </div>
 </section>
-<footer>생성 2026-11-05 12:17 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
+<footer>생성 2026-11-20 05:43 UTC · 정의: docs/ops_bi/02_ops_metric_definitions.md</footer>
 </main>
 
 <nav class="tabs">

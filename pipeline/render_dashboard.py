@@ -44,6 +44,39 @@ def read(path):
         return list(csv.DictReader(fh))
 
 
+# Revenue = sessions x session CVR x orders per order-session x revenue coverage x AOV.
+# The two middle terms make the product exact: CVR counts sessions (not orders) and AOV
+# counts only orders with a revenue value. Shares split the log change, so they add up to 100%.
+FACTORS = [
+    ("세션", lambda t: t["sessions"], lambda v: f"{v:,.0f}"),
+    ("세션 전환율", lambda t: t["order_sessions"] / t["sessions"], lambda v: f"{v * 100:.2f}%"),
+    ("세션당 주문 수", lambda t: t["orders"] / t["order_sessions"], lambda v: f"{v:.2f}"),
+    ("매출 기록 비율", lambda t: t["orders_with_revenue"] / t["orders"], lambda v: f"{v * 100:.1f}%"),
+    ("객단가", lambda t: t["revenue"] / t["orders_with_revenue"], lambda v: f"${v:,.2f}"),
+]
+
+
+def window_sums(days):
+    keys = ["sessions", "order_sessions", "orders", "orders_with_revenue", "revenue"]
+    return {k: sum(f(d[k]) or 0 for d in days) for k in keys}
+
+
+def decompose(cur_days, prev_days):
+    """Factors of the last 7 days vs the 7 before; empty if a factor cannot be computed."""
+    cur, prev = window_sums(cur_days), window_sums(prev_days)
+    if any(v <= 0 for v in [*cur.values(), *prev.values()]):
+        return []
+    total = math.log(cur["revenue"] / prev["revenue"])
+    rows = []
+    for label, calc, show in FACTORS:
+        c, p = calc(cur), calc(prev)
+        rows.append({"label": label, "value": show(c), "change": f"{c / p - 1:+.1%}",
+                     "share": f"{math.log(c / p) / total:.0%}" if abs(total) > 1e-9 else "–"})
+    rows.append({"label": "매출 (7일 합)", "value": f"${cur['revenue']:,.0f}",
+                 "change": f"{cur['revenue'] / prev['revenue'] - 1:+.1%}", "share": "100%"})
+    return rows
+
+
 def sparkline(values, w=120, h=32):
     pts = [(i, v) for i, v in enumerate(values) if v is not None]
     if len(pts) < 2:
@@ -120,12 +153,7 @@ def render(run_dir):
                "step": "" if i == 0 or not steps[i - 1][1] else f"이전 단계 대비 {v / steps[i - 1][1] * 100:.1f}%"}
               for i, (n, v) in enumerate(steps)]
 
-    decomposition = [
-        {"label": "세션 (7일 합)", "value": table.get(("K03_sessions", "r7_value"), "–"), "change": table.get(("K03_sessions", "r7_change"), "–")},
-        {"label": "세션 전환율", "value": table.get(("K05_session_cvr", "r7_value"), "–"), "change": table.get(("K05_session_cvr", "r7_change"), "–")},
-        {"label": "객단가", "value": table.get(("K06_aov", "r7_value"), "–"), "change": table.get(("K06_aov", "r7_change"), "–")},
-        {"label": "매출 (7일 합)", "value": table.get(("K01_revenue", "r7_value"), "–"), "change": table.get(("K01_revenue", "r7_change"), "–")},
-    ]
+    decomposition = decompose(trend[-7:], trend[-14:-7]) if len(trend) >= 14 else []
 
     detail = [{"name": r["metric_name"], "tier": r["tier"], "day": fmt.value(r["metric_id"], r["unit"], r["value_day"]),
                "dod": fmt.change(r["unit"], r["dod_change"]), "wow": fmt.change(r["unit"], r["wow_day_change"]),
@@ -153,7 +181,8 @@ def render(run_dir):
         day=day, weekday="월화수목금토일"[d.weekday()], days=days,
         tiles=tiles, funnel=funnel,
         cart_rate=f"{cart_rate:.1f}%",
-        decomposition=decomposition, detail=detail, charts=charts, ai=ai,
+        decomposition=decomposition, decomp_check=next(({"label": DQ_BADGE[r["status"]][2]} for r in dq if r["check_id"].startswith("R6")), None),
+        detail=detail, charts=charts, ai=ai,
         dq=[{**r, "badge": DQ_BADGE[r["status"]]} for r in dq],
         generated=dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
     )

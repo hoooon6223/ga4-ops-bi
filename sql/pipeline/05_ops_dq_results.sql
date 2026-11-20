@@ -1,4 +1,4 @@
--- Step 5. Data-quality checks (DQ01~DQ07) and reconciliation rules (R1~R5) for @run_date.
+-- Step 5. Data-quality checks (DQ01~DQ08) and reconciliation rules (R1~R3, R5, R6) for @run_date.
 -- Definitions & thresholds: docs/ops_bi/02_ops_metric_definitions.md §5, §6 (v1.3 thresholds from sql/eda/13)
 -- status: PASS / WARN / FAIL / SKIP (comparison window not available yet)
 
@@ -35,6 +35,26 @@ r7p AS (
   SELECT COUNT(*) AS n, SUM(orders) AS orders, SUM(revenue) AS revenue
   FROM `bigquery-457902.ga4_ops_bi.ops_kpi_daily`
   WHERE kpi_date BETWEEN DATE_SUB(@run_date, INTERVAL 13 DAY) AND DATE_SUB(@run_date, INTERVAL 7 DAY)
+),
+-- R6 inputs: 7-day values from the comparison table, bridge terms from the daily table.
+r6 AS (
+  SELECT
+    COUNT(*) AS n,
+    SAFE_DIVIDE(SUM(orders), SUM(order_sessions)) AS orders_per_order_session,
+    SAFE_DIVIDE(SUM(orders_with_revenue), SUM(orders)) AS revenue_coverage,
+    (SELECT AS STRUCT
+       MAX(IF(metric_id = 'K01_revenue', r7_value, NULL)) AS revenue,
+       MAX(IF(metric_id = 'K03_sessions', r7_value, NULL)) AS sessions,
+       MAX(IF(metric_id = 'K05_session_cvr', r7_value, NULL)) AS cvr,
+       MAX(IF(metric_id = 'K06_aov', r7_value, NULL)) AS aov
+     FROM `bigquery-457902.ga4_ops_bi.ops_kpi_comparison` WHERE kpi_date = @run_date) AS c
+  FROM `bigquery-457902.ga4_ops_bi.ops_kpi_daily`
+  WHERE kpi_date BETWEEN DATE_SUB(@run_date, INTERVAL 6 DAY) AND @run_date
+),
+r6v AS (
+  SELECT n, c.revenue AS revenue,
+    c.sessions * c.cvr * orders_per_order_session * revenue_coverage * c.aov AS product
+  FROM r6
 ),
 v AS (
   SELECT
@@ -94,6 +114,12 @@ checks AS (
   UNION ALL
   SELECT 'R5_dedup_revenue', '중복 제거 매출 <= 원본 매출', revenue, FORMAT('<= %.2f', raw_revenue),
     IF(revenue <= raw_revenue + 0.01, 'PASS', 'FAIL'), FORMAT('revenue=%.2f, raw_revenue=%.2f', revenue, raw_revenue) FROM v
+  UNION ALL
+  -- Revenue breakdown on the dashboard: the five terms must multiply back to 7-day revenue.
+  SELECT 'R6_revenue_decomposition', '매출 분해 = 매출 (최근 7일, 5개 항의 곱)', SAFE_DIVIDE(product, revenue) - 1, '|diff| < 0.001',
+    CASE WHEN n < 7 OR product IS NULL OR revenue IS NULL OR revenue = 0 THEN 'SKIP'
+         WHEN ABS(SAFE_DIVIDE(product, revenue) - 1) < 0.001 THEN 'PASS' ELSE 'FAIL' END,
+    FORMAT('product=%s, revenue_r7=%s', IFNULL(FORMAT('%.2f', product), 'null'), IFNULL(FORMAT('%.2f', revenue), 'null')) FROM r6v
 )
 SELECT
   @run_date AS dq_date,

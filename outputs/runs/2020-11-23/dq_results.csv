@@ -11,3 +11,4 @@ dq_date,check_id,check_name,value,threshold,status,detail
 2020-11-23,R2_order_session_rollup,주문 = 세션 합산 (건수·매출),0.0,diff = 0,PASS,"orders=72 vs 72, revenue=4241.00 vs 4241.00"
 2020-11-23,R3_order_sessions,주문 세션 수 <= 원본 purchase 세션 수,62.0,<= 62,PASS,"order_sessions=62, raw_purchase_sessions=62"
 2020-11-23,R5_dedup_revenue,중복 제거 매출 <= 원본 매출,4241.0,<= 8482.00,PASS,"revenue=4241.00, raw_revenue=8482.00"
+2020-11-23,R6_revenue_decomposition,"매출 분해 = 매출 (최근 7일, 5개 항의 곱)",0.0,|diff| < 0.001,PASS,"product=25814.00, revenue_r7=25814.00"
