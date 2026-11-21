@@ -1,0 +1,39 @@
+name: tests
+
+# Unit tests on every push / PR that touches code, so a broken change is caught right away
+# instead of at the next daily run. No BigQuery, no API keys, no browser needed.
+# Pushes made by the daily run (GITHUB_TOKEN) do not trigger this workflow.
+on:
+  push:
+    paths:
+      - "pipeline/**"
+      - "sql/**"
+      - "templates/**"
+      - "tests/**"
+      - "requirements.txt"
+      - "docs/ai_comment_guide.md"
+      - ".github/workflows/**"
+  pull_request:
+    paths:
+      - "pipeline/**"
+      - "sql/**"
+      - "templates/**"
+      - "tests/**"
+      - "requirements.txt"
+      - "docs/ai_comment_guide.md"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -t .

@@ -59,7 +59,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add outputs/runs site
-          git diff --cached --quiet || git commit -m "ops-bi: daily run $(ls outputs/runs | tail -1)"
+          # Name the days this run actually changed (a re-run of an old date names that date).
+          DAYS=$(git diff --cached --name-only -- outputs/runs | cut -d/ -f3 | sort -u | paste -sd, -)
+          git diff --cached --quiet || git commit -m "ops-bi: daily run ${DAYS:-site only}"
           git push
 
       - uses: actions/upload-pages-artifact@v3
