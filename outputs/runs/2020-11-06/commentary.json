@@ -1,5 +1,11 @@
 {
-  "ok": false,
-  "status": "caution",
-  "reason": "AI 요약을 건너뛰었어요 (--skip-ai)."
+  "ok": true,
+  "model": "claude-opus-5-5",
+  "headline": "주목 지표 없음.",
+  "highlights": [],
+  "watch_items": [
+    "매출: 최근 7일 vs 직전 7일 값 없음.",
+    "주문 수: 최근 7일 vs 직전 7일 값 없음.",
+    "세션: 지난주 같은 요일 대비 값 없음."
+  ]
 }
